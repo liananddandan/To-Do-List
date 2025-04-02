@@ -24,8 +24,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Configuration\Migrations\" />
       <Folder Include="Controllers\" />
-      <Folder Include="DesignFactory\" />
+      <Folder Include="Identity\" />
     </ItemGroup>
 
 </Project>
