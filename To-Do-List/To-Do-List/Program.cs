@@ -1,15 +1,20 @@
 using System.Text;
 using System.Text.Json;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using To_Do_List.Configuration.Extensions;
-using To_Do_List.DbContext;
-using To_Do_List.Entities;
-using To_Do_List.JWT.Options;
+using To_Do_List.Filter;
+using To_Do_List.Identity.Controllers.Login;
+using To_Do_List.Identity.DbContext;
+using To_Do_List.Identity.Entities;
+using To_Do_List.Identity.Implements;
+using To_Do_List.Identity.Interface;
+using To_Do_List.Identity.Options;
+using To_Do_List.Identity.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,6 +96,17 @@ builder.Services.AddAuthentication(options =>
             return Task.CompletedTask;
         }
     };
+});
+
+builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
+
+builder.Services.AddScoped<IdentityService, IdentityService>();
+builder.Services.AddScoped<IIdRepository, IdRepository>();
+
+//Filter
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ApiResponseWrapperFilter>();
 });
 
 var app = builder.Build();

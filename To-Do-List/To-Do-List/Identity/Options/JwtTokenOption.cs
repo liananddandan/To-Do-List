@@ -1,4 +1,4 @@
-namespace To_Do_List.JWT.Options;
+namespace To_Do_List.Identity.Options;
 
 public class JwtTokenOption
 {

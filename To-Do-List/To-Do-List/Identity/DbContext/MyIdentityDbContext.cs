@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using To_Do_List.Entities;
+using To_Do_List.Identity.Entities;
 
-namespace To_Do_List.DbContext;
+namespace To_Do_List.Identity.DbContext;
 
 public class MyIdentityDbContext : IdentityDbContext<MyUser, MyRole, long>
 {

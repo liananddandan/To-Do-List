@@ -4,10 +4,10 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SelfLearnProject.Entities;
-using To_Do_List.JWT.Interface;
-using To_Do_List.JWT.Options;
+using To_Do_List.Identity.Interface;
+using To_Do_List.Identity.Options;
 
-namespace To_Do_List.JWT;
+namespace To_Do_List.Identity.Token;
 
 public class TokenHelper(IOptionsSnapshot<JwtTokenOption> jwtTokenOption) : ITokenHelper
 {

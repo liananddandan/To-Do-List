@@ -1,6 +1,6 @@
 using SelfLearnProject.Entities;
 
-namespace To_Do_List.JWT.Interface;
+namespace To_Do_List.Identity.Interface;
 
 public interface ITokenHelper
 {

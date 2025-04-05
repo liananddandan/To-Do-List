@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace To_Do_List.Entities;
+namespace To_Do_List.Identity.Entities;
 
 public class MyUser : IdentityUser<long>
 {
