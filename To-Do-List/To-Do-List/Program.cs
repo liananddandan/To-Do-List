@@ -1,7 +1,10 @@
+using System.Text;
 using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using To_Do_List.Configuration.Extensions;
 using To_Do_List.DbContext;
@@ -43,9 +46,9 @@ identityBuilder.AddEntityFrameworkStores<MyIdentityDbContext>()
 
 // JWT
 var jwtJson = builder.Configuration[JwtTokenOption.JwtKey];
-if (!string.IsNullOrEmpty(jwtJson))
+JwtTokenOption jwtOptions = JsonSerializer.Deserialize<JwtTokenOption>(jwtJson);
+if (jwtOptions != null)
 {
-    var jwtOptions = JsonSerializer.Deserialize<JwtTokenOption>(jwtJson);
     builder.Services.Configure<JwtTokenOption>(options =>
     {
         options.Issuer = jwtOptions.Issuer;
@@ -54,6 +57,41 @@ if (!string.IsNullOrEmpty(jwtJson))
         options.AccessTokenExpiresMinutes = jwtOptions.AccessTokenExpiresMinutes;
     });
 }
+else
+{
+    throw new ArgumentException("JWT token options are required.");
+}
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new ()
+    {
+        ValidateIssuer = true,
+        ValidIssuer = jwtOptions.Issuer,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.IssuerSigningKey)),
+        ValidateAudience = true,
+        ValidAudience = jwtOptions.Audience,
+        ValidateLifetime = true,
+        ClockSkew = TimeSpan.FromMinutes(1)
+    };
+    options.Events = new JwtBearerEvents()
+    {
+        OnAuthenticationFailed = context =>
+        {
+            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            {
+                context.Response.Headers.Add("Token-Expired", "true");
+            }
+            return Task.CompletedTask;
+        }
+    };
+});
 
 var app = builder.Build();
 
@@ -65,7 +103,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

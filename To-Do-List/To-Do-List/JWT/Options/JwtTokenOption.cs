@@ -6,5 +6,5 @@ public class JwtTokenOption
     public string Issuer { get; set; }
     public string Audience { get; set; }
     public string IssuerSigningKey { get; set; }
-    public string AccessTokenExpiresMinutes { get; set; }
+    public int AccessTokenExpiresMinutes { get; set; }
 }
