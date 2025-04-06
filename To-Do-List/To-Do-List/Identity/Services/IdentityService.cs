@@ -8,10 +8,10 @@ namespace To_Do_List.Identity.Services;
 
 public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
 {
-    public async Task<(SignInResult, ApiResponseCode)> Register(string requestUserName, string requestPassword,
+    public async Task<(SignInResult, ApiResponseCode)> RegisterAsync(string requestUserName, string requestPassword,
         string requestEmail)
     {
-        var user = await repository.FindUserByUserName(requestUserName);
+        var user = await repository.FindUserByUserNameAsync(requestUserName);
         if (user != null)
         {
             return (SignInResult.Failed, ApiResponseCode.UserExisted);
@@ -25,17 +25,17 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
                 PasswordHash = GetHashPassword(requestPassword),
                 UserGuid = Guid.NewGuid()
             };
-            var identityResult = await repository.CreateUser(myUser);
+            var identityResult = await repository.CreateUserAsync(myUser);
             return identityResult.Succeeded
                 ? (SignInResult.Success, ApiResponseCode.UserCreateSuccess)
                 : (SignInResult.Failed, ApiResponseCode.UserCreatFailed);
         }
     }
 
-    public async Task<(SignInResult signInResult, ApiResponseCode code, string? token)> LoginByEmailAndPassword(
+    public async Task<(SignInResult signInResult, ApiResponseCode code, string? token)> LoginByEmailAndPasswordAsync(
         string requestEmail, string requestPassword)
     {
-        var user = await repository.FindUserByEmail(requestEmail);
+        var user = await repository.FindUserByEmailAsync(requestEmail);
         if (user == null)
         {
             return (SignInResult.Failed, ApiResponseCode.UserNotFound, null);
@@ -55,6 +55,19 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
             JWTVersion = user.Version,
         });
         return (SignInResult.Success, ApiResponseCode.UserLoginSuccess, jwtToken.TokenStr);
+    }
+
+    public async Task<(IdentityResult identityResult, ApiResponseCode code)> ChangePasswordAsync(string userId, string password)
+    {
+        var identityResult = await repository.ChangePasswordAsync(userId, password);
+        if (identityResult.Succeeded)
+        {
+            return (identityResult, ApiResponseCode.UserChangePasswordSuccess);
+        }
+        else
+        {
+            return (identityResult, ApiResponseCode.UserChangePasswordFailed);
+        }
     }
 
     private string GetHashPassword(string password)

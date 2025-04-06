@@ -5,7 +5,10 @@ namespace To_Do_List.Identity.Interface;
 
 public interface IIdRepository
 { 
-    Task<MyUser?> FindUserByUserName(string userName);
-    Task<MyUser?> FindUserByEmail(string email);
-    Task<IdentityResult> CreateUser(MyUser user);
+    Task<MyUser?> FindUserByUserNameAsync(string userName);
+    Task<MyUser?> FindUserByEmailAsync(string email);
+    Task<MyUser?> FindUserByIdAsync(string id);
+    Task<IdentityResult> CreateUserAsync(MyUser user);
+    Task<IdentityResult> UpdateUserAsync(MyUser user);
+    Task<IdentityResult> ChangePasswordAsync(string userId, string password);
 }
