@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace SelfLearnProject.Entities;
+namespace To_Do_List.Identity.Token;
 
 public class JwtToken
 {

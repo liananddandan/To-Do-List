@@ -11,6 +11,11 @@ public class IdRepository(UserManager<MyUser> userManager) : IIdRepository
         return userManager.FindByNameAsync(userName);
     }
 
+    public Task<MyUser?> FindUserByEmail(string email)
+    {
+        return userManager.FindByEmailAsync(email);
+    }
+
     public Task<IdentityResult> CreateUser(MyUser user)
     {
         return userManager.CreateAsync(user);

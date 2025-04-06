@@ -3,7 +3,6 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SelfLearnProject.Entities;
 using To_Do_List.Identity.Interface;
 using To_Do_List.Identity.Options;
 
@@ -37,7 +36,7 @@ public class TokenHelper(IOptionsSnapshot<JwtTokenOption> jwtTokenOption) : ITok
 
         return CreateTokenString(claims);
     }
-    
+
     private JwtToken CreateTokenString(IEnumerable<Claim> claims)
     {
         DateTime expires = DateTime.Now.AddHours(jwtTokenOption.Value.AccessTokenExpiresMinutes);

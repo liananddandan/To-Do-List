@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
 using FluentValidation;
@@ -15,6 +16,7 @@ using To_Do_List.Identity.Implements;
 using To_Do_List.Identity.Interface;
 using To_Do_List.Identity.Options;
 using To_Do_List.Identity.Services;
+using To_Do_List.Identity.Token;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -66,6 +68,7 @@ else
 {
     throw new ArgumentException("JWT token options are required.");
 }
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,10 +92,12 @@ builder.Services.AddAuthentication(options =>
     {
         OnAuthenticationFailed = context =>
         {
-            if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-            {
-                context.Response.Headers.Add("Token-Expired", "true");
-            }
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validated successfully");
             return Task.CompletedTask;
         }
     };
@@ -102,11 +107,13 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 
 builder.Services.AddScoped<IdentityService, IdentityService>();
 builder.Services.AddScoped<IIdRepository, IdRepository>();
+builder.Services.AddScoped<ITokenHelper, TokenHelper>();
 
 //Filter
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ApiResponseWrapperFilter>();
+    options.Filters.Add<ApiResponseWrapperFilter>(order: 1);
+    options.Filters.Add<JwtVersionCheckFilter>(order: 2);
 });
 
 var app = builder.Build();
