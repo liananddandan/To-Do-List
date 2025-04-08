@@ -17,6 +17,10 @@ using To_Do_List.Identity.Interface;
 using To_Do_List.Identity.Options;
 using To_Do_List.Identity.Services;
 using To_Do_List.Identity.Token;
+using To_Do_List.Tasks.DbContext;
+using To_Do_List.Tasks.Implement;
+using To_Do_List.Tasks.Interface;
+using To_Do_List.Tasks.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +43,12 @@ builder.Services.AddDbContext<MyIdentityDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
+builder.Services.AddDbContext<TaskDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+});
+
 builder.Services.AddDataProtection();
 builder.Services.AddIdentityCore<MyUser>(options =>
 {
@@ -108,6 +118,9 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>()
 builder.Services.AddScoped<IdentityService, IdentityService>();
 builder.Services.AddScoped<IIdRepository, IdRepository>();
 builder.Services.AddScoped<ITokenHelper, TokenHelper>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository>();
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<TaskCategoryService, TaskCategoryService>();
 
 //Filter
 builder.Services.AddControllers(options =>
