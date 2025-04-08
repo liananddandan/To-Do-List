@@ -19,9 +19,35 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
         return await taskDbContext.Categories.FindAsync(categoryId);
     }
 
-    public async Task AddAsync(Category category)
+    public async Task AddCategoryAsync(Category category)
     {
         await taskDbContext.Categories.AddAsync(category);
         await taskDbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Object>> GetAllCategoriesWithTasksAsync(string userId)
+    {
+        return await taskDbContext.Categories
+            .Where(c => c.UserId == userId)
+            .Select(c => new
+            {
+                c.Id,
+                c.Name,
+                c.Description,
+                c.CreatedAt,
+                c.IsDefault,
+                Tasks = c.Tasks.OrderBy(t => t.Priority)
+                    .Select(t => new
+                {
+                    t.Id,
+                    t.Description,
+                    t.Title,
+                    t.IsCompleted,
+                    t.DueDate,
+                    t.CreatedDate,
+                    t.Priority
+                }).ToList()
+            })
+            .ToListAsync();
     }
 }

@@ -49,9 +49,14 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
                 UserId = userId,
                 IsDefault = true
             };
-            await categoryRepository.AddAsync(category);
+            await categoryRepository.AddCategoryAsync(category);
         }
 
         return category;
+    }
+
+    public async Task<IEnumerable<Object>> GetAllCategoryWithTasksAsync(string userId)
+    {
+        return await categoryRepository.GetAllCategoriesWithTasksAsync(userId);
     }
 }

@@ -6,5 +6,6 @@ public interface ICategoryRepository
 {
     Task<Category?> GetDefaultCategoryAsync(string userId);
     Task<Category?> GetCategoryByIdAsync(string categoryId);
-    Task AddAsync(Category category);
+    Task AddCategoryAsync(Category category);
+    Task<IEnumerable<Object>> GetAllCategoriesWithTasksAsync(string userId);
 }

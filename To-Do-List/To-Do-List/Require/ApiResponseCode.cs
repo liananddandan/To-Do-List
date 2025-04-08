@@ -16,5 +16,7 @@ public enum ApiResponseCode
     UserPasswordError = 200104,
     UserChangePasswordFailed = 200105,
     TaskCreateSuccess = 300000,
+    TaskGetAllSuccess = 300001,
     CategoryIdNotFound = 300101,
+    TaskGetAllFailed = 300102,
 }
