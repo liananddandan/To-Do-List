@@ -2,7 +2,7 @@ using FluentValidation;
 
 namespace To_Do_List.Tasks.Controller;
 
-public record UpdateCategoryRequest(long CategoryId, string? Name, string? Description);
+public record UpdateCategoryRequest(string CategoryId, string? Name, string? Description);
 
 public class UpdateCategoryRequestValidator : AbstractValidator<UpdateCategoryRequest>
 {

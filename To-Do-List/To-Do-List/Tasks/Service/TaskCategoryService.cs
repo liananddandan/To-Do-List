@@ -16,10 +16,10 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         }
         else
         {
-            category = await categoryRepository.GetCategoryByIdAsync(categoryId);
+            category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
             if (category == null)
             {
-                return ApiResponseCode.CategoryIdNotFound;
+                return ApiResponseCode.CategoryIdNotFoundInCurrentUser;
             }
         }
 
@@ -71,5 +71,28 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         };
         await categoryRepository.AddCategoryAsync(category);
         return ApiResponseCode.TaskCreateSuccess;
+    }
+
+    public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? requestName, 
+        string? requestDescription, string userId)
+    {
+        var category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
+        if (category == null)
+        {
+            return ApiResponseCode.CategoryIdNotFoundInCurrentUser;
+        }
+
+        if (!string.IsNullOrEmpty(requestName))
+        {
+            category.Name = requestName;
+        }
+
+        if (!string.IsNullOrEmpty(requestDescription))
+        {
+            category.Description = requestDescription;
+        }
+
+        await categoryRepository.UpdateCategoryAsync(category);
+        return ApiResponseCode.CategoryUpdateSuccess;
     }
 }

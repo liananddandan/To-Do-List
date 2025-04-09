@@ -49,6 +49,14 @@ public class TaskController(
     [HttpPut]
     public async Task<ActionResult> UpdateCategoryAsync(UpdateCategoryRequest request)
     {
-        return Ok();
+        var result = await taskCategoryService.UpdateCategoryAsync(request.CategoryId, request.Name, request.Description, UserId);
+        if (result != ApiResponseCode.CategoryUpdateSuccess)
+        {
+            return BadRequest(new ResponseData(result, "Category update failed"));
+        }
+        else
+        {
+            return Ok(new ResponseData(result, "Category updated successfully"));
+        }
     }
 }

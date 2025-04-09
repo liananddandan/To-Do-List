@@ -14,9 +14,11 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
             .FirstOrDefaultAsync();
     }
 
-    public async Task<Category?> GetCategoryByIdAsync(string categoryId)
+    public async Task<Category?> GetCategoryByIdAsync(string categoryId, string userId)
     {
-        return await taskDbContext.Categories.FindAsync(Convert.ToInt64(categoryId));
+        return await taskDbContext.Categories
+            .Where(c => c.UserId == userId && c.Id == Convert.ToInt64(categoryId))
+            .FirstOrDefaultAsync();
     }
 
     public async Task AddCategoryAsync(Category category)
@@ -50,5 +52,11 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
                 }).ToList()
             })
             .ToListAsync();
+    }
+
+    public async Task UpdateCategoryAsync(Category category)
+    {
+        taskDbContext.Categories.Update(category);
+        await taskDbContext.SaveChangesAsync();
     }
 }
