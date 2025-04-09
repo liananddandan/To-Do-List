@@ -16,7 +16,7 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
 
     public async Task<Category?> GetCategoryByIdAsync(string categoryId)
     {
-        return await taskDbContext.Categories.FindAsync(categoryId);
+        return await taskDbContext.Categories.FindAsync(Convert.ToInt64(categoryId));
     }
 
     public async Task AddCategoryAsync(Category category)
@@ -36,7 +36,8 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
                 c.Description,
                 c.CreatedAt,
                 c.IsDefault,
-                Tasks = c.Tasks.OrderBy(t => t.Priority)
+                Tasks = c.Tasks.Where(t => !t.IsDeleted)
+                    .OrderBy(t => t.Priority)
                     .Select(t => new
                 {
                     t.Id,

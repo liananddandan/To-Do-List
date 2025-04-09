@@ -59,4 +59,17 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
     {
         return await categoryRepository.GetAllCategoriesWithTasksAsync(userId);
     }
+
+    public async Task<ApiResponseCode> CreateCategoryAsync(string requestName, 
+        string? requestDescription, string userId)
+    {
+        var category = new Category()
+        {
+            Name = requestName,
+            Description = requestDescription,
+            UserId = userId
+        };
+        await categoryRepository.AddCategoryAsync(category);
+        return ApiResponseCode.TaskCreateSuccess;
+    }
 }
