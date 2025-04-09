@@ -95,4 +95,26 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         await categoryRepository.UpdateCategoryAsync(category);
         return ApiResponseCode.CategoryUpdateSuccess;
     }
+
+    public async Task<ApiResponseCode> DeleteCategoryById(string categoryId, string userId)
+    {
+        var category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
+        if (category == null)
+        {
+            return ApiResponseCode.CategoryIdNotFoundInCurrentUser;
+        }
+        category.IsDeleted = true;
+        var defaultCategory = await categoryRepository.GetDefaultCategoryAsync(userId);
+        if (defaultCategory == null)
+        {
+            return ApiResponseCode.CategoryDefaultIsMissing;
+        }
+        var tasks = await taskRepository.GetTasksByCategoryIdAsync(categoryId);
+        foreach (var task in tasks)
+        {
+            task.Category = defaultCategory;
+        }
+        await categoryRepository.UpdateCategoryAsync(category);
+        return ApiResponseCode.DeleteCategorySuccess;
+    }
 }

@@ -59,4 +59,18 @@ public class TaskController(
             return Ok(new ResponseData(result, "Category updated successfully"));
         }
     }
+
+    [HttpDelete]
+    public async Task<ActionResult> DeleteCategoryAsync(DeleteCategoryRequest request)
+    {
+        var result = await taskCategoryService.DeleteCategoryById(request.CategoryId, UserId);
+        if (result != ApiResponseCode.DeleteCategorySuccess)
+        {
+            return BadRequest(new ResponseData(result, "Category delete failed"));
+        }
+        else
+        {
+            return Ok(new ResponseData(result, "Category deleted successfully"));
+        }
+    }
 }

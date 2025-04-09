@@ -17,7 +17,9 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
     public async Task<Category?> GetCategoryByIdAsync(string categoryId, string userId)
     {
         return await taskDbContext.Categories
-            .Where(c => c.UserId == userId && c.Id == Convert.ToInt64(categoryId))
+            .Where(c => c.UserId == userId 
+                        && c.Id == Convert.ToInt64(categoryId)
+                        && !c.IsDeleted)
             .FirstOrDefaultAsync();
     }
 
@@ -30,7 +32,7 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
     public async Task<IEnumerable<Object>> GetAllCategoriesWithTasksAsync(string userId)
     {
         return await taskDbContext.Categories
-            .Where(c => c.UserId == userId)
+            .Where(c => c.UserId == userId && !c.IsDeleted)
             .Select(c => new
             {
                 c.Id,
@@ -59,4 +61,5 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
         taskDbContext.Categories.Update(category);
         await taskDbContext.SaveChangesAsync();
     }
+    
 }

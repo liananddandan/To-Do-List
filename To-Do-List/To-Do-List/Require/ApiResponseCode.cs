@@ -19,6 +19,9 @@ public enum ApiResponseCode
     TaskGetAllSuccess = 300001,
     CategoryCreateSuccess = 300002,
     CategoryUpdateSuccess = 300003,
+    DeleteCategorySuccess = 300004,
     CategoryIdNotFoundInCurrentUser = 300101,
     TaskGetAllFailed = 300102,
+    CategoryDefaultIsMissing = 300103,
+    
 }
