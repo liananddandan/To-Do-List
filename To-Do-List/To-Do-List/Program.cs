@@ -127,6 +127,7 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add<ApiResponseWrapperFilter>(order: 1);
     options.Filters.Add<JwtVersionCheckFilter>(order: 2);
+    options.Filters.Add<ValidationFilter>(order: 3);
 });
 
 var app = builder.Build();

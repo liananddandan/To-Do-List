@@ -2,7 +2,6 @@ using System.Security.Claims;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using To_Do_List.Attribute;
-using To_Do_List.Identity.Entities;
 using To_Do_List.Identity.Services;
 using To_Do_List.Require;
 
@@ -19,12 +18,6 @@ public class UserController(IdentityService identityService,
     [NotCheckJwtVersion]
     public async Task<ActionResult> Register(RegisterRequest request)
     {
-        var result = await registerRequestValidator.ValidateAsync(request);
-        if (!result.IsValid)
-        {
-            return BadRequest(new ResponseData(ApiResponseCode.ParameterError, 
-                result.Errors.Select(e => e.ErrorMessage).ToList()));
-        }
         var (signInResult, code) = await identityService.RegisterAsync(request.UserName, request.Password, request.Email);
         if (signInResult.Succeeded)
         {
@@ -40,12 +33,6 @@ public class UserController(IdentityService identityService,
     [NotCheckJwtVersion]
     public async Task<ActionResult> Login(LoginRequest request)
     {
-        var validationResult = await loginRequestValidator.ValidateAsync(request);
-        if (!validationResult.IsValid)
-        {
-            return BadRequest(new ResponseData(ApiResponseCode.ParameterError,
-                validationResult.Errors.Select(e => e.ErrorMessage).ToList()));
-        }
         var (signInResult, code, token) = await identityService.LoginByEmailAndPasswordAsync(request.Email, request.Password);
         if (!signInResult.Succeeded)
         {
@@ -57,12 +44,6 @@ public class UserController(IdentityService identityService,
     [HttpPut]
     public async Task<ActionResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
-        var validateResult = await changePasswordValidator.ValidateAsync(request);
-        if (!validateResult.IsValid)
-        {
-            return BadRequest(new ResponseData(ApiResponseCode.ParameterError,
-                validateResult.Errors.Select(e => e.ErrorMessage).ToList()));
-        }
         var userId = User.FindFirstValue("UserId");
         if (userId == null)
         {
