@@ -17,10 +17,11 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         else
         {
             category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
-            if (category == null)
-            {
-                return ApiResponseCode.CategoryIdNotFoundInCurrentUser;
-            }
+        }
+        
+        if (category == null)
+        {
+            return ApiResponseCode.CategoryIdNotFoundForCurrentUser;
         }
 
         var task = new TaskItem()
@@ -37,7 +38,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         return ApiResponseCode.TaskCreateSuccess;
     }
 
-    private async Task<Category> GetOrCreateDefaultCategoryAsync(string userId)
+    private async Task<Category?> GetOrCreateDefaultCategoryAsync(string userId)
     {
         var category = await categoryRepository.GetDefaultCategoryAsync(userId);
         if (category == null)
@@ -49,7 +50,11 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
                 UserId = userId,
                 IsDefault = true
             };
-            await categoryRepository.AddCategoryAsync(category);
+            ApiResponseCode code = await categoryRepository.AddCategoryAsync(category);
+            if (code != ApiResponseCode.CategoryCreateSuccess)
+            {
+                return null;
+            }
         }
 
         return category;
@@ -69,8 +74,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
             Description = requestDescription,
             UserId = userId
         };
-        await categoryRepository.AddCategoryAsync(category);
-        return ApiResponseCode.TaskCreateSuccess;
+        return await categoryRepository.AddCategoryAsync(category);
     }
 
     public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? requestName, 
@@ -79,7 +83,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         var category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
         if (category == null)
         {
-            return ApiResponseCode.CategoryIdNotFoundInCurrentUser;
+            return ApiResponseCode.CategoryIdNotFoundForCurrentUser;
         }
 
         if (!string.IsNullOrEmpty(requestName))
@@ -101,7 +105,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         var category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
         if (category == null)
         {
-            return ApiResponseCode.CategoryIdNotFoundInCurrentUser;
+            return ApiResponseCode.CategoryIdNotFoundForCurrentUser;
         }
         category.IsDeleted = true;
         var defaultCategory = await categoryRepository.GetDefaultCategoryAsync(userId);

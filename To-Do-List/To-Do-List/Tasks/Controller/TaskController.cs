@@ -36,7 +36,7 @@ public class TaskController(
     public async Task<ActionResult> CreateCategoryAsync(CreateCategoryRequest request)
     {
         var result = await taskCategoryService.CreateCategoryAsync(request.Name, request.Description, UserId);
-        if (result == ApiResponseCode.TaskCreateSuccess)
+        if (result == ApiResponseCode.CategoryCreateSuccess)
         {
             return Ok(new ResponseData(result, "Category created successfully"));
         }

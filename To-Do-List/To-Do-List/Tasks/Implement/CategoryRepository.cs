@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using To_Do_List.Require;
 using To_Do_List.Tasks.DbContext;
 using To_Do_List.Tasks.Entities;
 using To_Do_List.Tasks.Interface;
@@ -23,10 +24,18 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
             .FirstOrDefaultAsync();
     }
 
-    public async Task AddCategoryAsync(Category category)
+    public async Task<ApiResponseCode> AddCategoryAsync(Category category)
     {
-        await taskDbContext.Categories.AddAsync(category);
-        await taskDbContext.SaveChangesAsync();
+        try
+        {
+            await taskDbContext.Categories.AddAsync(category);
+            await taskDbContext.SaveChangesAsync();
+            return ApiResponseCode.CategoryCreateSuccess;
+        }
+        catch
+        {
+            return ApiResponseCode.CategoryCreateFailed;
+        }
     }
 
     public async Task<IEnumerable<Object>> GetAllCategoriesWithTasksAsync(string userId)
