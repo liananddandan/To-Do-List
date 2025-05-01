@@ -21,9 +21,10 @@ public class IdRepository(UserManager<MyUser> userManager) : IIdRepository
         return userManager.FindByIdAsync(id);
     }
 
-    public Task<IdentityResult> CreateUserAsync(MyUser user)
+    public Task<IdentityResult> CreateUserAsync(MyUser user, string password)
     {
-        return userManager.CreateAsync(user);
+        // (user, password)会检查密码强度，（user）这个方法不回检查密码强度
+        return userManager.CreateAsync(user, password);
     }
 
     public Task<IdentityResult> UpdateUserAsync(MyUser user)
@@ -39,8 +40,17 @@ public class IdRepository(UserManager<MyUser> userManager) : IIdRepository
             return IdentityResult.Failed();
         }
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
-        await userManager.ResetPasswordAsync(user, token, password);
+        var resetResult = await userManager.ResetPasswordAsync(user, token, password);
+        if (!resetResult.Succeeded)
+        {
+            return resetResult;
+        }
         user.Version++;
         return await UpdateUserAsync(user);
+    }
+
+    public Task<MyUser?> GetUserByIdAsync(string id)
+    {
+        return userManager.FindByIdAsync(id);
     }
 }

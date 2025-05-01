@@ -10,6 +10,7 @@ public enum ApiResponseCode
     UserCreateSuccess = 200000,
     UserLoginSuccess = 200001,
     UserChangePasswordSuccess = 200002,
+    UserFetchSuccess = 200003,
     UserExisted = 200101,
     UserCreatFailed = 200102,
     UserNotFound = 200103,

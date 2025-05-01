@@ -8,13 +8,13 @@ namespace To_Do_List.Identity.Services;
 
 public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
 {
-    public async Task<(SignInResult, ApiResponseCode)> RegisterAsync(string requestUserName, string requestPassword,
+    public async Task<(IdentityResult, ApiResponseCode)> RegisterAsync(string requestUserName, string requestPassword,
         string requestEmail)
     {
         var user = await repository.FindUserByUserNameAsync(requestUserName);
         if (user != null)
         {
-            return (SignInResult.Failed, ApiResponseCode.UserExisted);
+            return (IdentityResult.Failed(), ApiResponseCode.UserExisted);
         }
         else
         {
@@ -22,13 +22,11 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
             {
                 UserName = requestUserName,
                 Email = requestEmail,
-                PasswordHash = GetHashPassword(requestPassword),
                 UserGuid = Guid.NewGuid()
             };
-            var identityResult = await repository.CreateUserAsync(myUser);
-            return identityResult.Succeeded
-                ? (SignInResult.Success, ApiResponseCode.UserCreateSuccess)
-                : (SignInResult.Failed, ApiResponseCode.UserCreatFailed);
+            var identityResult = await repository.CreateUserAsync(myUser, requestPassword);
+            return (identityResult, 
+                identityResult.Succeeded ? ApiResponseCode.UserCreateSuccess : ApiResponseCode.UserCreatFailed);
         }
     }
 
@@ -73,5 +71,18 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
     private string GetHashPassword(string password)
     {
         return new PasswordHasher<object>().HashPassword(null, password);
+    }
+
+    public async Task<(ApiResponseCode code, MyUser? user)> GetUserByIdAsync(string userId)
+    {
+        var user =  await repository.GetUserByIdAsync(userId);
+        if (user == null)
+        {
+            return (ApiResponseCode.UserNotFound, null);
+        }
+        else
+        {
+            return (ApiResponseCode.UserFetchSuccess ,user);
+        }
     }
 }

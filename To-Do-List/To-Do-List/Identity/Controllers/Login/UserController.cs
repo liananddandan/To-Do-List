@@ -2,6 +2,8 @@ using System.Security.Claims;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using To_Do_List.Attribute;
+using To_Do_List.Controller;
+using To_Do_List.Identity.Entities;
 using To_Do_List.Identity.Services;
 using To_Do_List.Require;
 
@@ -9,23 +11,20 @@ namespace To_Do_List.Identity.Controllers.Login;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class UserController(IdentityService identityService, 
-    IValidator<RegisterRequest> registerRequestValidator, 
-    IValidator<LoginRequest> loginRequestValidator,
-    IValidator<ChangePasswordRequest> changePasswordValidator) : ControllerBase
+public class UserController(IdentityService identityService) : ProjectBaseController
 {
     [HttpPost]
     [NotCheckJwtVersion]
     public async Task<ActionResult> Register(RegisterRequest request)
     {
-        var (signInResult, code) = await identityService.RegisterAsync(request.UserName, request.Password, request.Email);
-        if (signInResult.Succeeded)
+        var (identityResult, code) = await identityService.RegisterAsync(request.UserName, request.Password, request.Email);
+        if (identityResult.Succeeded)
         {
             return Ok(new ResponseData(code, null));
         }
         else
         {
-            return BadRequest(new ResponseData(code, "Registration failed"));
+            return BadRequest(new ResponseData(code, identityResult.Errors));
         }
     }
 
@@ -44,25 +43,27 @@ public class UserController(IdentityService identityService,
     [HttpPut]
     public async Task<ActionResult> ChangePasswordAsync(ChangePasswordRequest request)
     {
-        var userId = User.FindFirstValue("UserId");
-        if (userId == null)
-        {
-            return BadRequest(new ResponseData(ApiResponseCode.TokenPhraseUserIdError, "User id is missing."));
-        }
-        var (identityResult, code) = await identityService.ChangePasswordAsync(userId, request.Password);
+        var (identityResult, code) = await identityService.ChangePasswordAsync(UserId, request.Password);
         if (identityResult.Succeeded)
         {
             return Ok(new ResponseData(code, null));
         }
         else
         {
-            return BadRequest(new ResponseData(code, "Password change failed"));
+            return BadRequest(new ResponseData(code, identityResult.Errors));
         }
     }
 
-    [HttpGet]
-    public ActionResult TestToken()
+    [HttpGet]    
+    public async Task<ActionResult> GetUserByIdAsync()
     {
-        return Ok("Token Test Ok");
+        var (code, user) = await identityService.GetUserByIdAsync(UserId);
+        if (code != ApiResponseCode.UserFetchSuccess)
+        {
+            return BadRequest(new ResponseData(code, "User not found"));
+        }
+        
+        var dto = new UserDto(user?.UserName!, user?.Email!);
+        return Ok(new ResponseData(code, dto));
     }
 }

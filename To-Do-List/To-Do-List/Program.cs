@@ -52,6 +52,10 @@ builder.Services.AddDbContext<TaskDbContext>(options =>
 builder.Services.AddDataProtection();
 builder.Services.AddIdentityCore<MyUser>(options =>
 {
+    options.Password.RequiredLength = 8;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireLowercase = false;
     options.Tokens.PasswordResetTokenProvider = TokenOptions.DefaultEmailProvider;
     options.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
 });
@@ -130,6 +134,20 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ValidationFilter>(order: 3);
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("DynamicCORS", builder =>
+    {
+        builder.SetIsOriginAllowed(origin =>
+            {
+                return origin.Contains("localhost");
+            })
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -138,6 +156,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+app.UseCors("DynamicCORS");
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
