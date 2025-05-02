@@ -7,4 +7,6 @@ public class JwtTokenOption
     public string Audience { get; set; }
     public string IssuerSigningKey { get; set; }
     public int AccessTokenExpiresMinutes { get; set; }
+    
+    public int RefreshTokenExpiresDays { get; set; }
 }

@@ -76,6 +76,7 @@ if (jwtOptions != null)
         options.Audience = jwtOptions.Audience;
         options.IssuerSigningKey = jwtOptions.IssuerSigningKey;
         options.AccessTokenExpiresMinutes = jwtOptions.AccessTokenExpiresMinutes;
+        options.RefreshTokenExpiresDays = jwtOptions.RefreshTokenExpiresDays;
     });
 }
 else

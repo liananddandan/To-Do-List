@@ -9,7 +9,7 @@ public interface IIdRepository
     Task<MyUser?> FindUserByEmailAsync(string email);
     Task<MyUser?> FindUserByIdAsync(string id);
     Task<IdentityResult> CreateUserAsync(MyUser user, string password);
-    Task<IdentityResult> UpdateUserAsync(MyUser user);
     Task<IdentityResult> ChangePasswordAsync(string userId, string password);
     Task<MyUser?> GetUserByIdAsync(string id);
+    Task<IdentityResult> IncrementTokenVersionAsync(MyUser user);
 }

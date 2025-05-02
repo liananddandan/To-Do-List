@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using To_Do_List.Attribute;
 using To_Do_List.Identity.Entities;
+using To_Do_List.Require;
 
 namespace To_Do_List.Filter;
 
@@ -25,7 +26,41 @@ public class JwtVersionCheckFilter(UserManager<MyUser> userManager) : IAsyncActi
             await next();
             return;
         }
+
+        if (!context.HttpContext.User.Identity.IsAuthenticated)
+        {
+            context.Result = new ObjectResult(new {code = ApiResponseCode.AccessTokenExpired, 
+                message = "JWTVersion expire"}){StatusCode = StatusCodes.Status401Unauthorized};
+            return;
+        }
+
+        var claimJwtType = context.HttpContext.User.FindFirst("token_type");
+        if (claimJwtType == null)
+        {
+            context.Result = new ObjectResult("JWTVersion type not found"){StatusCode = 404};
+            return;
+        }
+
+        if (claimJwtType.Value != "access_token")
+        {
+            context.Result = new ObjectResult("JWTVersion type not correct"){StatusCode = 404};
+            return;
+        }
         
+        var expiresAt = context.HttpContext.User.FindFirst("exp")?.Value;
+        if (string.IsNullOrEmpty(expiresAt))
+        {
+            context.Result = new ObjectResult("JWTVersion expire not correct"){StatusCode = 404};
+            return;
+        }
+        var expireDateTimeUtc = DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiresAt)).UtcDateTime;
+        if (DateTime.UtcNow > expireDateTimeUtc)
+        {
+            context.Result = new ObjectResult(new {code = ApiResponseCode.AccessTokenExpired, 
+                message = "JWTVersion expire"}){StatusCode = StatusCodes.Status401Unauthorized};
+            return;
+        }
+
         var claimJwtVersion = context.HttpContext.User.FindFirst("JWTVersion");
 
         if (claimJwtVersion == null)
@@ -43,7 +78,8 @@ public class JwtVersionCheckFilter(UserManager<MyUser> userManager) : IAsyncActi
 
         if (user.Version > clientJwtVersion)
         {
-            context.Result = new ObjectResult("JWTVersion expire"){StatusCode = 400};
+            context.Result = new ObjectResult(new {code = ApiResponseCode.AccessTokenExpired, 
+                message = "JWTVersion expire"}){StatusCode = StatusCodes.Status401Unauthorized};
             return;
         }
         await next();

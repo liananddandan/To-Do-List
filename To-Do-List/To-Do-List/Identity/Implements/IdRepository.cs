@@ -27,7 +27,7 @@ public class IdRepository(UserManager<MyUser> userManager) : IIdRepository
         return userManager.CreateAsync(user, password);
     }
 
-    public Task<IdentityResult> UpdateUserAsync(MyUser user)
+    private Task<IdentityResult> UpdateUserAsync(MyUser user)
     {
         return userManager.UpdateAsync(user);
     }
@@ -52,5 +52,11 @@ public class IdRepository(UserManager<MyUser> userManager) : IIdRepository
     public Task<MyUser?> GetUserByIdAsync(string id)
     {
         return userManager.FindByIdAsync(id);
+    }
+
+    public Task<IdentityResult> IncrementTokenVersionAsync(MyUser user)
+    {
+        user.Version++;
+        return UpdateUserAsync(user);
     }
 }

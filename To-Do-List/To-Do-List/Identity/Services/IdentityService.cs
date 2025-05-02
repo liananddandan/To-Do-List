@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using To_Do_List.Identity.Entities;
 using To_Do_List.Identity.Interface;
+using To_Do_List.Identity.Token;
 using To_Do_List.Require;
 
 namespace To_Do_List.Identity.Services;
@@ -30,13 +31,13 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
         }
     }
 
-    public async Task<(SignInResult signInResult, ApiResponseCode code, string? token)> LoginByEmailAndPasswordAsync(
-        string requestEmail, string requestPassword)
+    public async Task<(ApiResponseCode code, string? accessToken, string? refreshToken)> 
+        LoginByEmailAndPasswordAsync(string requestEmail, string requestPassword)
     {
         var user = await repository.FindUserByEmailAsync(requestEmail);
         if (user == null)
         {
-            return (SignInResult.Failed, ApiResponseCode.UserNotFound, null);
+            return (ApiResponseCode.UserNotFound, null, null);
         }
 
         var passwordVerityResult =
@@ -44,15 +45,17 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
         if (passwordVerityResult == PasswordVerificationResult.Failed)
         {
             // todo: lock user logic
-            return (SignInResult.Failed, ApiResponseCode.UserPasswordError, null);
+            return (ApiResponseCode.UserPasswordError, null, null);
         }
         // Generate Token
-        var jwtToken = tokenHelper.CreateToken(new
+        var entry = new
         {
             UserId = user.Id,
             JWTVersion = user.Version,
-        });
-        return (SignInResult.Success, ApiResponseCode.UserLoginSuccess, jwtToken.TokenStr);
+        };
+        var accessToken = tokenHelper.CreateToken(entry, TokenType.AccessToken);
+        var refreshToken = tokenHelper.CreateToken(entry, TokenType.RefreshToken);
+        return (ApiResponseCode.UserLoginSuccess, accessToken.TokenStr, refreshToken.TokenStr);
     }
 
     public async Task<(IdentityResult identityResult, ApiResponseCode code)> ChangePasswordAsync(string userId, string password)
@@ -68,21 +71,41 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
         }
     }
 
-    private string GetHashPassword(string password)
-    {
-        return new PasswordHasher<object>().HashPassword(null, password);
-    }
-
     public async Task<(ApiResponseCode code, MyUser? user)> GetUserByIdAsync(string userId)
     {
         var user =  await repository.GetUserByIdAsync(userId);
+        return (user == null ? ApiResponseCode.UserNotFound : ApiResponseCode.UserFetchSuccess,
+                user);
+    }
+
+    public async Task<(ApiResponseCode code, string? accessToken, string? RefreshToken)> RefreshTokenAsync(string refreshToken)
+    {
+        var (code, principal) = tokenHelper.ValidateExpiredRefreshToken(refreshToken);
+        if (code != ApiResponseCode.RefreshTokenInfoCheckSuccess || principal == null)
+        {
+            return (code, null, null);
+        }
+        
+        var userId = principal.FindFirst("UserId")!.Value;
+        var user = await repository.GetUserByIdAsync(userId);
         if (user == null)
         {
-            return (ApiResponseCode.UserNotFound, null);
+            return (ApiResponseCode.UserNotFound, null, null);
         }
-        else
+        var jwtVersion = principal.FindFirst("JWTVersion")!.Value;
+        if (user.Version > long.Parse(jwtVersion))
         {
-            return (ApiResponseCode.UserFetchSuccess ,user);
+            return (ApiResponseCode.RefreshTokenInvalidVersion, null, null);
         }
+        
+        await repository.IncrementTokenVersionAsync(user);
+        var entry = new
+        {
+            UserId = user.Id,
+            JWTVersion = user.Version,
+        };
+        return (ApiResponseCode.RefreshTokenSuccess, 
+                tokenHelper.CreateToken(entry, TokenType.AccessToken).TokenStr,
+                tokenHelper.CreateToken(entry, TokenType.RefreshToken).TokenStr);
     }
 }
