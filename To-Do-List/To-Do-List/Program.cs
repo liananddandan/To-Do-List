@@ -1,4 +1,3 @@
-using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using System.Text.Json;
 using FluentValidation;
@@ -23,6 +22,8 @@ using To_Do_List.Tasks.Interface;
 using To_Do_List.Tasks.Service;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.AddConsole();
 
 builder.Configuration.AddEFConfiguration(options =>
     {

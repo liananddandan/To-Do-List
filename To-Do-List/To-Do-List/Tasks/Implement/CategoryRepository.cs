@@ -65,6 +65,19 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Category>?> GetAllCategoriesWithoutTasksAsync(string userId)
+    {
+        try
+        {
+            return await taskDbContext.Categories.Where(c => c.UserId == userId)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+
     public async Task UpdateCategoryAsync(Category category)
     {
         taskDbContext.Categories.Update(category);

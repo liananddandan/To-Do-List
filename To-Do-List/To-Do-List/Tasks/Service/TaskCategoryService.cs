@@ -6,19 +6,12 @@ namespace To_Do_List.Tasks.Service;
 
 public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRepository taskRepository)
 {
-    public async Task<ApiResponseCode> CreateTaskAsync(string title, string? description, DateTime? dueDate, int priority,
-        string userId, string? categoryId)
+    public async Task<ApiResponseCode> CreateTaskAsync(string title, string? description, DateTime? dueDate,
+        int priority,
+        string userId, string categoryId)
     {
-        Category? category;
-        if (categoryId == null)
-        {
-            category = await GetOrCreateDefaultCategoryAsync(userId);
-        }
-        else
-        {
-            category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
-        }
-        
+        Category? category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
+
         if (category == null)
         {
             return ApiResponseCode.CategoryIdNotFoundForCurrentUser;
@@ -38,34 +31,27 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         return ApiResponseCode.TaskCreateSuccess;
     }
 
-    private async Task<Category?> GetOrCreateDefaultCategoryAsync(string userId)
-    {
-        var category = await categoryRepository.GetDefaultCategoryAsync(userId);
-        if (category == null)
-        {
-            category = new Category()
-            {
-                Name = "Default",
-                Description = "Default category",
-                UserId = userId,
-                IsDefault = true
-            };
-            ApiResponseCode code = await categoryRepository.AddCategoryAsync(category);
-            if (code != ApiResponseCode.CategoryCreateSuccess)
-            {
-                return null;
-            }
-        }
-
-        return category;
-    }
-
     public async Task<IEnumerable<Object>> GetAllCategoryWithTasksAsync(string userId)
     {
         return await categoryRepository.GetAllCategoriesWithTasksAsync(userId);
     }
 
-    public async Task<ApiResponseCode> CreateCategoryAsync(string requestName, 
+    public async Task<ApiResponseCode> CreateDefaultCategoryAsync(long userId)
+    {
+        Category category = new Category()
+        {
+            Name = "Default",
+            Description = "Default category.",
+            UserId = userId.ToString(),
+            IsDefault = true
+        };
+        ApiResponseCode code = await categoryRepository.AddCategoryAsync(category);
+        return code == ApiResponseCode.CategoryCreateSuccess
+            ? ApiResponseCode.DefaultCategoryCreateSuccess
+            : ApiResponseCode.DefaultCategoryCreateFailed;
+    }
+
+    public async Task<ApiResponseCode> CreateCategoryAsync(string requestName,
         string? requestDescription, string userId)
     {
         var category = new Category()
@@ -77,7 +63,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         return await categoryRepository.AddCategoryAsync(category);
     }
 
-    public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? requestName, 
+    public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? requestName,
         string? requestDescription, string userId)
     {
         var category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
@@ -107,18 +93,31 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         {
             return ApiResponseCode.CategoryIdNotFoundForCurrentUser;
         }
+
         category.IsDeleted = true;
         var defaultCategory = await categoryRepository.GetDefaultCategoryAsync(userId);
         if (defaultCategory == null)
         {
             return ApiResponseCode.CategoryDefaultIsMissing;
         }
+
         var tasks = await taskRepository.GetTasksByCategoryIdAsync(categoryId);
         foreach (var task in tasks)
         {
             task.Category = defaultCategory;
         }
+
         await categoryRepository.UpdateCategoryAsync(category);
         return ApiResponseCode.DeleteCategorySuccess;
+    }
+
+    public async Task<(ApiResponseCode code, IEnumerable<Category>? categories)>
+        GetAllCategoryWithoutTasksAsync(string userId)
+    {
+        var categories = await categoryRepository.GetAllCategoriesWithoutTasksAsync(userId);
+        return (categories == null
+                ? ApiResponseCode.CategoryGetAllWithoutTasksFailed
+                : ApiResponseCode.CategoryGetAllWithoutTasksSuccess,
+            categories);
     }
 }

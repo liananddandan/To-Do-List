@@ -1,13 +1,17 @@
+using System.Linq.Expressions;
 using System.Security.Claims;
+using System.Transactions;
 using Microsoft.AspNetCore.Identity;
 using To_Do_List.Identity.Entities;
 using To_Do_List.Identity.Interface;
 using To_Do_List.Identity.Token;
 using To_Do_List.Require;
+using To_Do_List.Tasks.Service;
 
 namespace To_Do_List.Identity.Services;
 
-public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
+public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper,
+    TaskCategoryService taskCategoryService, ILogger<IdentityService> logger)
 {
     public async Task<(IdentityResult, ApiResponseCode)> RegisterAsync(string requestUserName, string requestPassword,
         string requestEmail)
@@ -25,9 +29,33 @@ public class IdentityService(IIdRepository repository, ITokenHelper tokenHelper)
                 Email = requestEmail,
                 UserGuid = Guid.NewGuid()
             };
-            var identityResult = await repository.CreateUserAsync(myUser, requestPassword);
-            return (identityResult, 
-                identityResult.Succeeded ? ApiResponseCode.UserCreateSuccess : ApiResponseCode.UserCreatFailed);
+            using (var transactionScope = new TransactionScope(
+                       TransactionScopeOption.Required,
+                       TransactionScopeAsyncFlowOption.Enabled))
+            {
+                try
+                {
+                    var identityResult = await repository.CreateUserAsync(myUser, requestPassword);
+                    if (!identityResult.Succeeded)
+                    {
+                        return (identityResult, ApiResponseCode.UserCreatFailed);
+                    }
+
+                    var categoryCreateResult = await taskCategoryService.CreateDefaultCategoryAsync(myUser.Id);
+                    if (categoryCreateResult != ApiResponseCode.DefaultCategoryCreateSuccess)
+                    {
+                        return (IdentityResult.Failed(), ApiResponseCode.DefaultCategoryCreateFailed);
+                    }
+
+                    transactionScope.Complete();
+                    return (identityResult, ApiResponseCode.UserCreateSuccess);
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError(ex, ex.Message);
+                    return (IdentityResult.Failed(), ApiResponseCode.UserCreatFailed);
+                }
+            }
         }
     }
 

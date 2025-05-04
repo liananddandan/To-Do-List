@@ -1,14 +1,14 @@
 using Microsoft.AspNetCore.Mvc;
 using To_Do_List.Controller;
 using To_Do_List.Require;
+using To_Do_List.Tasks.Entities;
 using To_Do_List.Tasks.Service;
 
 namespace To_Do_List.Tasks.Controller;
 
 [ApiController]
 [Route("[controller]/[action]")]
-public class TaskController(
-    TaskCategoryService taskCategoryService) : ProjectBaseController
+public class TaskController(TaskCategoryService taskCategoryService) : ProjectBaseController
 {
     [HttpPost]
     public async Task<ActionResult> CreateTaskAsync(CreateTaskRequest request)
@@ -29,7 +29,19 @@ public class TaskController(
     public async Task<ActionResult> GetAllTasksAsync()
     {
         var result = await taskCategoryService.GetAllCategoryWithTasksAsync(UserId);
-        return Ok(new ResponseData(ApiResponseCode.TaskGetAllSuccess, new {Categories = result}));
+        return Ok(new ResponseData(ApiResponseCode.TaskGetAllSuccess, result));
+    }
+
+    [HttpGet]
+    public async Task<ActionResult> GetAllCategoriesAsync()
+    {
+        var (code, categories) = await taskCategoryService.GetAllCategoryWithoutTasksAsync(UserId);
+        if (code != ApiResponseCode.CategoryGetAllWithoutTasksSuccess)
+        {
+            return BadRequest(new ResponseData(code, "Get all categories failed"));
+        }
+        return Ok(new ResponseData(code, categories!.Select(c => 
+            new CategoryDto(c.Id, c.Name, c.Description, c.CreatedAt))));
     }
 
     [HttpPost]

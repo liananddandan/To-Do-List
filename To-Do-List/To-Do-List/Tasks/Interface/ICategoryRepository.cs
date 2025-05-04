@@ -9,5 +9,6 @@ public interface ICategoryRepository
     Task<Category?> GetCategoryByIdAsync(string categoryId, string userId);
     Task<ApiResponseCode> AddCategoryAsync(Category category);
     Task<IEnumerable<Object>> GetAllCategoriesWithTasksAsync(string userId);
+    Task<IEnumerable<Category>?> GetAllCategoriesWithoutTasksAsync(string userId);
     Task UpdateCategoryAsync(Category category);
 }
