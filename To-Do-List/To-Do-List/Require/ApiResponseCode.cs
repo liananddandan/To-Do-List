@@ -38,5 +38,7 @@ public enum ApiResponseCode
     CategoryCreateFailed = 300104,
     CategoryGetAllWithoutTasksFailed = 300105,
     DefaultCategoryCreateFailed = 300106,
+    CategoryCreateWithoutUserIdFail = 300107,
+    CategoryCreateDuplicatedNameFail = 300108,
     
 }

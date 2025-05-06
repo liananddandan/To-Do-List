@@ -51,7 +51,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
             : ApiResponseCode.DefaultCategoryCreateFailed;
     }
 
-    public async Task<ApiResponseCode> CreateCategoryAsync(string requestName,
+    public async Task<(ApiResponseCode, Category)> CreateCategoryAsync(string requestName,
         string? requestDescription, string userId)
     {
         var category = new Category()
@@ -60,7 +60,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
             Description = requestDescription,
             UserId = userId
         };
-        return await categoryRepository.AddCategoryAsync(category);
+        return (await categoryRepository.AddCategoryAsync(category), category);
     }
 
     public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? requestName,

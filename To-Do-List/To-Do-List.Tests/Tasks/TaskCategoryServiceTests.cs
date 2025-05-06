@@ -30,8 +30,9 @@ public class TaskCategoryServiceTests
             .Setup(r => r.AddCategoryAsync(It.IsAny<Category>()))
             .Returns(Task.FromResult(ApiResponseCode.CategoryCreateSuccess));
         
-        var result = await _service.CreateCategoryAsync(name, description, userId);
-        Assert.Equal(ApiResponseCode.CategoryCreateSuccess, result);
+        var (code, result) = await _service.CreateCategoryAsync(name, description, userId);
+        Assert.Equal(ApiResponseCode.CategoryCreateSuccess, code);
+        Assert.Equal(name, result.Name);
         _mockCategoryRepository.Verify(r => r.AddCategoryAsync(It.IsAny<Category>()), Times.Once);
     }
 
@@ -45,8 +46,9 @@ public class TaskCategoryServiceTests
             .Setup(r => r.AddCategoryAsync(It.IsAny<Category>()))
             .Returns(Task.FromResult(ApiResponseCode.CategoryCreateFailed));
         
-        var result = await _service.CreateCategoryAsync(name, description, userId);
-        Assert.Equal(ApiResponseCode.CategoryCreateFailed, result);
+        var (code, result) = await _service.CreateCategoryAsync(name, description, userId);
+        Assert.Equal(ApiResponseCode.CategoryCreateFailed, code);
+        Assert.Null(result);
         _mockCategoryRepository.Verify(r => r.AddCategoryAsync(It.IsAny<Category>()), Times.Once);
     }
 }

@@ -47,14 +47,15 @@ public class TaskController(TaskCategoryService taskCategoryService) : ProjectBa
     [HttpPost]
     public async Task<ActionResult> CreateCategoryAsync(CreateCategoryRequest request)
     {
-        var result = await taskCategoryService.CreateCategoryAsync(request.Name, request.Description, UserId);
+        var (result, category) = await taskCategoryService.CreateCategoryAsync(request.Name, request.Description, UserId);
         if (result == ApiResponseCode.CategoryCreateSuccess)
         {
-            return Ok(new ResponseData(result, "Category created successfully"));
+            return Ok(new ResponseData(result,
+                new CategoryDto(category.Id, category.Name, category.Description, category.CreatedAt)));
         }
         else
         {
-            return BadRequest(new ResponseData(result, "Category creation failed"));
+            return BadRequest(new ResponseData(result, null));
         }
     }
 

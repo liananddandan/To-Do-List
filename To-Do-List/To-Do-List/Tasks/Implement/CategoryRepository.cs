@@ -28,6 +28,18 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
     {
         try
         {
+            if (category.UserId == null)
+            {
+                return ApiResponseCode.CategoryCreateWithoutUserIdFail;
+            }
+
+            if (taskDbContext.Categories
+                .Any(c => c.UserId == category.UserId
+                                                    && c.Name == category.Name))
+            {
+                return ApiResponseCode.CategoryCreateDuplicatedNameFail;
+            }
+
             await taskDbContext.Categories.AddAsync(category);
             await taskDbContext.SaveChangesAsync();
             return ApiResponseCode.CategoryCreateSuccess;
