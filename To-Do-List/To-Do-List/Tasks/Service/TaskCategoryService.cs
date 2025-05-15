@@ -27,7 +27,15 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
             IsCompleted = false
         };
 
-        await taskRepository.AddTaskAsync(task);
+        try
+        {
+            await taskRepository.AddTaskAsync(task);
+        }
+        catch (Exception e)
+        {
+            return ApiResponseCode.TaskAddExceptionInDB;
+        }
+
         return ApiResponseCode.TaskCreateSuccess;
     }
 
@@ -45,26 +53,40 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
             UserId = userId.ToString(),
             IsDefault = true
         };
-        ApiResponseCode code = await categoryRepository.AddCategoryAsync(category);
-        return code == ApiResponseCode.CategoryCreateSuccess
-            ? ApiResponseCode.DefaultCategoryCreateSuccess
-            : ApiResponseCode.DefaultCategoryCreateFailed;
+        try
+        {
+            ApiResponseCode code = await categoryRepository.AddCategoryAsync(category);
+            return code == ApiResponseCode.CategoryCreateSuccess
+                ? ApiResponseCode.DefaultCategoryCreateSuccess
+                : ApiResponseCode.DefaultCategoryCreateFailed;
+        }
+        catch (Exception e)
+        {
+            return ApiResponseCode.DefaultCategoryCreateFailed;
+        }
     }
 
-    public async Task<(ApiResponseCode, Category)> CreateCategoryAsync(string requestName,
-        string? requestDescription, string userId)
+    public async Task<(ApiResponseCode, Category?)> CreateCategoryAsync(string name,
+        string? description, string userId)
     {
         var category = new Category()
         {
-            Name = requestName,
-            Description = requestDescription,
+            Name = name,
+            Description = description,
             UserId = userId
         };
-        return (await categoryRepository.AddCategoryAsync(category), category);
+        try
+        {
+            return (await categoryRepository.AddCategoryAsync(category), category);
+        }
+        catch (Exception e)
+        {
+            return (ApiResponseCode.CategoryCreateFailed, null);
+        }
     }
 
-    public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? requestName,
-        string? requestDescription, string userId)
+    public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? name,
+        string? description, string userId)
     {
         var category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
         if (category == null)
@@ -72,17 +94,25 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
             return ApiResponseCode.CategoryIdNotFoundForCurrentUser;
         }
 
-        if (!string.IsNullOrEmpty(requestName))
+        if (!string.IsNullOrEmpty(name))
         {
-            category.Name = requestName;
+            category.Name = name;
         }
 
-        if (!string.IsNullOrEmpty(requestDescription))
+        if (!string.IsNullOrEmpty(description))
         {
-            category.Description = requestDescription;
+            category.Description = description;
         }
 
-        await categoryRepository.UpdateCategoryAsync(category);
+        try
+        {
+            await categoryRepository.UpdateCategoryAsync(category);
+        }
+        catch (Exception e)
+        {
+            return ApiResponseCode.CategoryUpdateFailedInDB;
+        }
+
         return ApiResponseCode.CategoryUpdateSuccess;
     }
 

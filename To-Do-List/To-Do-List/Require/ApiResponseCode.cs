@@ -40,5 +40,6 @@ public enum ApiResponseCode
     DefaultCategoryCreateFailed = 300106,
     CategoryCreateWithoutUserIdFail = 300107,
     CategoryCreateDuplicatedNameFail = 300108,
-    
+    TaskAddExceptionInDB = 300109,
+    CategoryUpdateFailedInDB = 300110,
 }
