@@ -97,9 +97,9 @@ public class TaskCategoryServiceTests
         [Frozen] Mock<ICategoryRepository> mockCategoryRepository,
         TaskCategoryService sut,
         string userId,
-        IEnumerable<Object> items)
+        IEnumerable<Category> items)
     {
-        IEnumerable<Object> itemsList = items.ToList();
+        IEnumerable<Category> itemsList = items.ToList();
         // Arrange
         mockCategoryRepository
             .Setup(rep 
@@ -121,7 +121,7 @@ public class TaskCategoryServiceTests
         // Arrange
         mockCategoryRepository
             .Setup(rep => rep.GetAllCategoriesWithTasksAsync(userId))
-            .ReturnsAsync(new List<Object>());
+            .ReturnsAsync(new List<Category>());
         
         // Act
         var actualResult = await sut.GetAllCategoryWithTasksAsync(userId);
@@ -236,7 +236,8 @@ public class TaskCategoryServiceTests
         {
             Name = name,
             Description = description,
-            UserId = userId
+            UserId = userId,
+            IsDeleted = false
         };
         mockCategoryRepository.Setup(rep 
             => rep.AddCategoryAsync(It.Is<Category>(c =>

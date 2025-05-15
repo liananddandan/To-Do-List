@@ -36,22 +36,27 @@ public class TaskController(TaskCategoryService taskCategoryService) : ProjectBa
     public async Task<ActionResult> GetAllCategoriesAsync()
     {
         var (code, categories) = await taskCategoryService.GetAllCategoryWithoutTasksAsync(UserId);
-        if (code != ApiResponseCode.CategoryGetAllWithoutTasksSuccess)
+        if (code != ApiResponseCode.CategoryGetAllWithoutTasksSuccess || categories is null)
         {
             return BadRequest(new ResponseData(code, "Get all categories failed"));
         }
-        return Ok(new ResponseData(code, categories!.Select(c => 
-            new CategoryDto(c.Id, c.Name, c.Description, c.CreatedAt))));
+        return Ok(new ResponseData(code, categories));
     }
 
     [HttpPost]
     public async Task<ActionResult> CreateCategoryAsync(CreateCategoryRequest request)
     {
         var (result, category) = await taskCategoryService.CreateCategoryAsync(request.Name, request.Description, UserId);
-        if (result == ApiResponseCode.CategoryCreateSuccess)
+        if (result == ApiResponseCode.CategoryCreateSuccess && category != null)
         {
             return Ok(new ResponseData(result,
-                new CategoryDto(category.Id, category.Name, category.Description, category.CreatedAt)));
+                new CategoryDto
+                {
+                    Id = category.Id, 
+                    Name = category.Name, 
+                    Description = category.Description, 
+                    CreatedAt = category.CreatedAt
+                }));
         }
         else
         {

@@ -39,9 +39,10 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         return ApiResponseCode.TaskCreateSuccess;
     }
 
-    public async Task<IEnumerable<Object>> GetAllCategoryWithTasksAsync(string userId)
+    public async Task<IEnumerable<CategoryDto>> GetAllCategoryWithTasksAsync(string userId)
     {
-        return await categoryRepository.GetAllCategoriesWithTasksAsync(userId);
+        var categories =  await categoryRepository.GetAllCategoriesWithTasksAsync(userId);
+        return categories.Select(c => c.ToDto());
     }
 
     public async Task<ApiResponseCode> CreateDefaultCategoryAsync(long userId)
@@ -66,7 +67,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         }
     }
 
-    public async Task<(ApiResponseCode, Category?)> CreateCategoryAsync(string name,
+    public async Task<(ApiResponseCode, CategoryDto?)> CreateCategoryAsync(string name,
         string? description, string userId)
     {
         var category = new Category()
@@ -80,7 +81,7 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
             ApiResponseCode code = await categoryRepository.AddCategoryAsync(category);
             if (code == ApiResponseCode.CategoryCreateSuccess)
             {
-                return (code, category);
+                return (code, category.ToDto());
             }
             else
             {
@@ -149,13 +150,17 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         return ApiResponseCode.DeleteCategorySuccess;
     }
 
-    public async Task<(ApiResponseCode code, IEnumerable<Category>? categories)>
+    public async Task<(ApiResponseCode code, IEnumerable<CategoryDto>? categories)>
         GetAllCategoryWithoutTasksAsync(string userId)
     {
-        var categories = await categoryRepository.GetAllCategoriesWithoutTasksAsync(userId);
-        return (categories == null
-                ? ApiResponseCode.CategoryGetAllWithoutTasksFailed
-                : ApiResponseCode.CategoryGetAllWithoutTasksSuccess,
-            categories);
+        try
+        {
+            var categories = await categoryRepository.GetAllCategoriesWithoutTasksAsync(userId);
+            return (ApiResponseCode.CategoryGetAllWithoutTasksSuccess, categories.Select(c => c.ToDto()));
+        }
+        catch (Exception e)
+        {
+            return (ApiResponseCode.CategoryGetAllWithoutTasksFailed, null);
+        }
     }
 }

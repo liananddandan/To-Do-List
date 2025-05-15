@@ -43,44 +43,38 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
         return ApiResponseCode.CategoryCreateSuccess;
     }
 
-    public async Task<IEnumerable<Object>> GetAllCategoriesWithTasksAsync(string userId)
+    public async Task<IEnumerable<Category>> GetAllCategoriesWithTasksAsync(string userId)
     {
         return await taskDbContext.Categories
             .Where(c => c.UserId == userId && !c.IsDeleted)
-            .Select(c => new
+            .Select(c => new Category()
             {
-                c.Id,
-                c.Name,
-                c.Description,
-                c.CreatedAt,
-                c.IsDefault,
+                Id = c.Id,
+                Name = c.Name,
+                Description = c.Description,
+                CreatedAt = c.CreatedAt,
+                IsDefault = c.IsDefault,
+                UserId = c.UserId,
                 Tasks = c.Tasks.Where(t => !t.IsDeleted)
                     .OrderBy(t => t.Priority)
-                    .Select(t => new
+                    .Select(t => new TaskItem
                     {
-                        t.Id,
-                        t.Description,
-                        t.Title,
-                        t.IsCompleted,
-                        t.DueDate,
-                        t.CreatedDate,
-                        t.Priority
+                        Id = t.Id,
+                        Description = t.Description,
+                        Title = t.Title,
+                        IsCompleted = t.IsCompleted,
+                        DueDate = t.DueDate,
+                        CreatedDate = t.CreatedDate,
+                        Priority = t.Priority
                     }).ToList()
             })
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<Category>?> GetAllCategoriesWithoutTasksAsync(string userId)
+    public async Task<IEnumerable<Category>> GetAllCategoriesWithoutTasksAsync(string userId)
     {
-        try
-        {
-            return await taskDbContext.Categories.Where(c => c.UserId == userId)
-                .ToListAsync();
-        }
-        catch (Exception ex)
-        {
-            return null;
-        }
+        return await taskDbContext.Categories.Where(c => c.UserId == userId)
+            .ToListAsync();
     }
 
     public async Task UpdateCategoryAsync(Category category)
