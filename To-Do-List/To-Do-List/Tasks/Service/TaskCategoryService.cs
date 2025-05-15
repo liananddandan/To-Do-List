@@ -77,7 +77,15 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         };
         try
         {
-            return (await categoryRepository.AddCategoryAsync(category), category);
+            ApiResponseCode code = await categoryRepository.AddCategoryAsync(category);
+            if (code == ApiResponseCode.CategoryCreateSuccess)
+            {
+                return (code, category);
+            }
+            else
+            {
+                return (code, null);
+            }
         }
         catch (Exception e)
         {

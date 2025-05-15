@@ -3,11 +3,10 @@ using FluentAssertions;
 using Moq;
 using To_Do_List.Require;
 using To_Do_List.Tasks.Entities;
-using To_Do_List.Tasks.Implement;
 using To_Do_List.Tasks.Interface;
 using To_Do_List.Tasks.Service;
 
-namespace To_Do_List.Tests.Tasks;
+namespace To_Do_List.Tests.Tasks.Service;
 
 public class TaskCategoryServiceTests
 {
@@ -100,15 +99,16 @@ public class TaskCategoryServiceTests
         string userId,
         IEnumerable<Object> items)
     {
+        IEnumerable<Object> itemsList = items.ToList();
         // Arrange
         mockCategoryRepository
             .Setup(rep 
                 => rep.GetAllCategoriesWithTasksAsync(userId))
-            .ReturnsAsync(items);
+            .ReturnsAsync(itemsList);
         
         // Act
         var actualResult = await sut.GetAllCategoryWithTasksAsync(userId);
-        actualResult.Should().BeEquivalentTo(items);
+        actualResult.Should().BeEquivalentTo(itemsList);
         mockCategoryRepository.Verify(rep => rep.GetAllCategoriesWithTasksAsync(userId), Times.Once);
     }
 
@@ -252,7 +252,7 @@ public class TaskCategoryServiceTests
         
         // Assert
         actualCode.Should().Be(ApiResponseCode.CategoryCreateSuccess);
-        actualCategory.Id.Should().Be(categoryId);
+        actualCategory!.Id.Should().Be(categoryId);
         actualCategory.Should().BeEquivalentTo(category,
             opt => opt.Excluding(c => c.Id).Excluding(c => c.CreatedAt));
         mockCategoryRepository.Verify(rep => rep.AddCategoryAsync(It.IsAny<Category>()), Times.Once);
@@ -264,16 +264,9 @@ public class TaskCategoryServiceTests
         TaskCategoryService sut,
         string name,
         string description,
-        string userId,
-        long categoryId)
+        string userId)
     {
         // Arrange
-        Category category = new Category
-        {
-            Name = name,
-            Description = description,
-            UserId = userId
-        };
         mockCategoryRepository.Setup(rep 
                 => rep.AddCategoryAsync(It.Is<Category>(c =>
                     c.Name == name 
@@ -287,7 +280,7 @@ public class TaskCategoryServiceTests
         
         // Assert
         actualCode.Should().Be(ApiResponseCode.CategoryCreateFailed);
-        actualCategory.Id.Should().Be(0L);
+        actualCategory.Should().BeNull();
         mockCategoryRepository.Verify(rep => rep.AddCategoryAsync(It.IsAny<Category>()), Times.Once);
     }
     
@@ -297,16 +290,9 @@ public class TaskCategoryServiceTests
         TaskCategoryService sut,
         string name,
         string description,
-        string userId,
-        long categoryId)
+        string userId)
     {
         // Arrange
-        Category category = new Category
-        {
-            Name = name,
-            Description = description,
-            UserId = userId
-        };
         mockCategoryRepository.Setup(rep
                 => rep.AddCategoryAsync(It.Is<Category>(c =>
                     c.Name == name
@@ -430,8 +416,7 @@ public class TaskCategoryServiceTests
         string categoryId,
         string name,
         string description,
-        string userId,
-        Category category
+        string userId
     )
     {
         // Arrange
