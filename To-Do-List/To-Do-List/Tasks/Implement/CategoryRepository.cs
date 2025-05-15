@@ -18,7 +18,7 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
     public async Task<Category?> GetCategoryByIdAsync(string categoryId, string userId)
     {
         return await taskDbContext.Categories
-            .Where(c => c.UserId == userId 
+            .Where(c => c.UserId == userId
                         && c.Id == Convert.ToInt64(categoryId)
                         && !c.IsDeleted)
             .FirstOrDefaultAsync();
@@ -26,28 +26,21 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
 
     public async Task<ApiResponseCode> AddCategoryAsync(Category category)
     {
-        try
+        if (category.UserId == null)
         {
-            if (category.UserId == null)
-            {
-                return ApiResponseCode.CategoryCreateWithoutUserIdFail;
-            }
-
-            if (taskDbContext.Categories
-                .Any(c => c.UserId == category.UserId
-                                                    && c.Name == category.Name))
-            {
-                return ApiResponseCode.CategoryCreateDuplicatedNameFail;
-            }
-
-            await taskDbContext.Categories.AddAsync(category);
-            await taskDbContext.SaveChangesAsync();
-            return ApiResponseCode.CategoryCreateSuccess;
+            return ApiResponseCode.CategoryCreateWithoutUserIdFail;
         }
-        catch
+
+        if (taskDbContext.Categories
+            .Any(c => c.UserId == category.UserId
+                      && c.Name == category.Name))
         {
-            return ApiResponseCode.CategoryCreateFailed;
+            return ApiResponseCode.CategoryCreateDuplicatedNameFail;
         }
+
+        await taskDbContext.Categories.AddAsync(category);
+        await taskDbContext.SaveChangesAsync();
+        return ApiResponseCode.CategoryCreateSuccess;
     }
 
     public async Task<IEnumerable<Object>> GetAllCategoriesWithTasksAsync(string userId)
@@ -64,15 +57,15 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
                 Tasks = c.Tasks.Where(t => !t.IsDeleted)
                     .OrderBy(t => t.Priority)
                     .Select(t => new
-                {
-                    t.Id,
-                    t.Description,
-                    t.Title,
-                    t.IsCompleted,
-                    t.DueDate,
-                    t.CreatedDate,
-                    t.Priority
-                }).ToList()
+                    {
+                        t.Id,
+                        t.Description,
+                        t.Title,
+                        t.IsCompleted,
+                        t.DueDate,
+                        t.CreatedDate,
+                        t.Priority
+                    }).ToList()
             })
             .ToListAsync();
     }
@@ -95,5 +88,4 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
         taskDbContext.Categories.Update(category);
         await taskDbContext.SaveChangesAsync();
     }
-    
 }
