@@ -73,7 +73,9 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
 
     public async Task<IEnumerable<Category>> GetAllCategoriesWithoutTasksAsync(string userId)
     {
-        return await taskDbContext.Categories.Where(c => c.UserId == userId)
+        return await taskDbContext.Categories
+            .Where(c => c.UserId == userId)
+            .AsNoTracking()
             .ToListAsync();
     }
 
