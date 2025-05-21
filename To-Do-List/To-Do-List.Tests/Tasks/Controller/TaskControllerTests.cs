@@ -57,7 +57,7 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         response.EnsureSuccessStatusCode();
 
         var responseString = await response.Content.ReadAsStringAsync();
-        var apiResponse = JsonSerializer.Deserialize<ApiResponse<DataWrapper<string>>>(responseString);
+        var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<string>>>(responseString);
         apiResponse.Should().NotBeNull();
         apiResponse.Data.Info.Should().BeEquivalentTo("Task created successfully");
         apiResponse.Data.Code.Should().Be(300000);
@@ -76,7 +76,7 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
         var response = await _client.GetAsync("/Task/GetAllTasks");
         var jsonString = await response.Content.ReadAsStringAsync();
-        var apiResponse = JsonSerializer.Deserialize<ApiResponse<DataWrapper<List<CategoryDto>>>>(jsonString);
+        var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<List<CategoryDto>>>>(jsonString);
         apiResponse.Should().NotBeNull();
         apiResponse.Data.Code.Should().Be(300001);
         var categories = apiResponse.Data.Info;
@@ -96,7 +96,7 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
         var response = await _client.GetAsync("/Task/GetAllCategories");
         var jsonString = await response.Content.ReadAsStringAsync();
-        var apiResponse = JsonSerializer.Deserialize<ApiResponse<DataWrapper<List<CategoryDto>>>>(jsonString);
+        var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<List<CategoryDto>>>>(jsonString);
         apiResponse.Should().NotBeNull();
         apiResponse.Data.Code.Should().Be(300005);
         var categories = apiResponse.Data.Info;
@@ -119,7 +119,7 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         var request = new CreateCategoryRequest("Test" + UUID, "Test Description" + UUID);
         var response = await _client.PostAsJsonAsync("/Task/CreateCategory", request);
         var jsonString = await response.Content.ReadAsStringAsync();
-        var apiResponse = JsonSerializer.Deserialize<ApiResponse<DataWrapper<CategoryDto>>>(jsonString);
+        var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<CategoryDto>>>(jsonString);
         apiResponse.Should().NotBeNull();
         apiResponse.Data.Code.Should().Be(300002);
         var categoryDto = apiResponse.Data.Info;
