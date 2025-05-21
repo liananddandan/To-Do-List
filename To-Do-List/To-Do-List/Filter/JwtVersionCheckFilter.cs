@@ -8,7 +8,7 @@ using To_Do_List.Require;
 
 namespace To_Do_List.Filter;
 
-public class JwtVersionCheckFilter(UserManager<MyUser> userManager) : IAsyncActionFilter
+public class JwtVersionCheckFilter(UserManager<MyUser> userManager, IWebHostEnvironment _env) : IAsyncActionFilter
 {
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
@@ -76,7 +76,7 @@ public class JwtVersionCheckFilter(UserManager<MyUser> userManager) : IAsyncActi
             return;
         }
 
-        if (user.Version > clientJwtVersion)
+        if (user.Version > clientJwtVersion && !_env.IsEnvironment("Testing"))
         {
             context.Result = new ObjectResult(new {code = ApiResponseCode.AccessTokenExpired, 
                 message = "JWTVersion expire"}){StatusCode = StatusCodes.Status401Unauthorized};

@@ -23,7 +23,19 @@ using To_Do_List.Tasks.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ✅ 手动添加 UserSecrets，而不是用 builder.Host.ConfigureAppConfiguration
+if (!builder.Environment.IsProduction())
+{
+    builder.Configuration.AddUserSecrets(typeof(Program).Assembly, optional: true);
+}
+
 builder.Logging.AddConsole();
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
 
 builder.Configuration.AddEFConfiguration(options =>
     {
@@ -31,12 +43,6 @@ builder.Configuration.AddEFConfiguration(options =>
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
     }
 );
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
 
 // configure Identity
 builder.Services.AddDbContext<MyIdentityDbContext>(options =>
@@ -168,3 +174,5 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+public partial class Program { }
