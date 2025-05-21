@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text.Json;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,20 +12,12 @@ using Xunit.Abstractions;
 
 namespace To_Do_List.Tests.Tasks.Controller;
 
-public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Program>>
+public class TaskControllerTests(TestingWebApplicationFactory<Program> factory, ITestOutputHelper output) : IClassFixture<TestingWebApplicationFactory<Program>>
 {
-    private readonly HttpClient _client;
-    private readonly ITokenHelper _tokenHelper;
-    private readonly IConfiguration _configuration;
-    private readonly ITestOutputHelper _output;
-
-    public TaskControllerTests(TestingWebApplicationFactory<Program> factory, ITestOutputHelper output)
-    {
-        _client = factory.CreateClient();
-        _tokenHelper = factory.Services.GetRequiredService<ITokenHelper>();
-        _configuration = factory.Services.GetRequiredService<IConfiguration>();
-        _output = output;
-    }
+    private readonly HttpClient _client = factory.CreateClient();
+    private readonly ITokenHelper _tokenHelper = factory.Services.GetRequiredService<ITokenHelper>();
+    private readonly IConfiguration _configuration = factory.Services.GetRequiredService<IConfiguration>();
+    private readonly ITestOutputHelper _output = output;
 
     [Fact]
     public void ShouldReadUserSecrets()
@@ -47,8 +38,8 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         };
         var token = _tokenHelper.CreateToken(entry, TokenType.AccessToken);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
-        string UUID = Guid.NewGuid().ToString();
-        var request = new CreateTaskRequest("Test Task" + UUID, "Test Description" + UUID,
+        var uuid = Guid.NewGuid().ToString();
+        var request = new CreateTaskRequest("Test Task" + uuid, "Test Description" + uuid,
             DateTime.Today.AddDays(1), 1, "3");
         // Act: Call your API route (adjust route prefix if needed)
         var response = await _client.PostAsJsonAsync("/Task/CreateTask", request);
@@ -66,6 +57,7 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
     [Fact]
     public async Task GetAllTasks_ShouldReturnSuccess()
     {
+        // Arrange: JSON request matching CreateTaskRequest shape
         var testUserId = "7";
         var entry = new
         {
@@ -74,7 +66,12 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         };
         var token = _tokenHelper.CreateToken(entry, TokenType.AccessToken);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
+        
+        // Act: Call your API route (adjust route prefix if needed)
         var response = await _client.GetAsync("/Task/GetAllTasks");
+        
+        // Assert: success status and response content
+        response.EnsureSuccessStatusCode();
         var jsonString = await response.Content.ReadAsStringAsync();
         var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<List<CategoryDto>>>>(jsonString);
         apiResponse.Should().NotBeNull();
@@ -86,6 +83,7 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
     [Fact]
     public async Task GetAllCategories_IfUserHaveCategories_ShouldReturnSuccess()
     {
+        // Arrage
         var testUserId = "7";
         var entry = new
         {
@@ -94,7 +92,12 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         };
         var token = _tokenHelper.CreateToken(entry, TokenType.AccessToken);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
+       
+        // Action
         var response = await _client.GetAsync("/Task/GetAllCategories");
+        
+        // Assert
+        response.EnsureSuccessStatusCode();
         var jsonString = await response.Content.ReadAsStringAsync();
         var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<List<CategoryDto>>>>(jsonString);
         apiResponse.Should().NotBeNull();
@@ -107,6 +110,7 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
     [Fact]
     public async Task CreateCategoryAsync_ShouldReturnSuccess()
     {
+        // Arrage
         var testUserId = "7";
         var entry = new
         {
@@ -115,9 +119,14 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         };
         var token = _tokenHelper.CreateToken(entry, TokenType.AccessToken);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
-        string UUID = Guid.NewGuid().ToString();
-        var request = new CreateCategoryRequest("Test" + UUID, "Test Description" + UUID);
+        string uuid = Guid.NewGuid().ToString();
+        var request = new CreateCategoryRequest("Test" + uuid, "Test Description" + uuid);
+        
+        // Action
         var response = await _client.PostAsJsonAsync("/Task/CreateCategory", request);
+        
+        // Assert
+        response.EnsureSuccessStatusCode();
         var jsonString = await response.Content.ReadAsStringAsync();
         var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<CategoryDto>>>(jsonString);
         apiResponse.Should().NotBeNull();
@@ -125,5 +134,58 @@ public class TaskControllerTests : IClassFixture<TestingWebApplicationFactory<Pr
         var categoryDto = apiResponse.Data.Info;
         categoryDto.Should().NotBeNull();
         categoryDto.Id.Should().BePositive();
+    }
+
+    [Fact]
+    public async Task UpdateCategoryAsync_ShouldReturnSuccess()
+    {
+        // Arrange
+        var testUserId = "7";
+        var entry = new
+        {
+            UserId = testUserId,
+            JWTVersion = 1,
+        };
+        var token = _tokenHelper.CreateToken(entry, TokenType.AccessToken);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
+        var uuid = Guid.NewGuid().ToString();
+        var request = new UpdateCategoryRequest("4", "", "updated Description " + uuid);
+        
+        // Action
+        var response = await _client.PutAsJsonAsync("/Task/UpdateCategory", request);
+        
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<string>>>(jsonString);
+        apiResponse.Should().NotBeNull();
+        apiResponse.Data.Code.Should().Be(300003);
+        apiResponse.Data.Info.Should().BeEquivalentTo("Category updated successfully");
+    }
+
+    [Fact]
+    public async Task DeleteCategoryAsync_ShouldReturnSuccess()
+    {
+        // Arrange
+        var testUserId = "7";
+        var entry = new
+        {
+            UserId = testUserId,
+            JWTVersion = 1,
+        };
+        var token = _tokenHelper.CreateToken(entry, TokenType.AccessToken);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
+        var request = new DeleteCategoryRequest("8");
+        
+        // Action
+        var response = await _client.PostAsJsonAsync("/Task/DeleteCategory", request);
+        
+        // Assert
+        response.EnsureSuccessStatusCode();
+        var jsonString = await response.Content.ReadAsStringAsync();
+        var apiResponse = JsonHelper.Deserialize<ApiResponse<DataWrapper<string>>>(jsonString);
+        apiResponse.Should().NotBeNull();
+        apiResponse.Data.Code.Should().Be(300004);
+        apiResponse.Data.Info.Should().BeEquivalentTo("Category deleted successfully");
     }
 }

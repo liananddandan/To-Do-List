@@ -78,7 +78,7 @@ public class TaskController(TaskCategoryService taskCategoryService) : ProjectBa
         }
     }
 
-    [HttpDelete]
+    [HttpPost]
     public async Task<ActionResult> DeleteCategoryAsync(DeleteCategoryRequest request)
     {
         var result = await taskCategoryService.DeleteCategoryById(request.CategoryId, UserId);
