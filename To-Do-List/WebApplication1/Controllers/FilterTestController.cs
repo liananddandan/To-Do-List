@@ -3,22 +3,23 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApplication1.Controllers;
 
 [ApiController]
-[Route("[controller]/[action]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/FilterTest")]
 public class FilterTestController: ControllerBase
 {
-    [HttpGet]
+    [HttpGet("tasks")]
     public IActionResult Tasks()
     {
         return Ok();
     }
 
-    [HttpGet]
+    [HttpGet("fail")]
     public IActionResult Fail()
     {
         throw new InvalidOperationException("test invalid operation exception");
     }
 
-    [HttpGet]
+    [HttpGet("error")]
     public IActionResult Error()
     {
         throw new Exception("test exception");
