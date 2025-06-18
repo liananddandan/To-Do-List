@@ -51,13 +51,13 @@ jobs:
       - name: Build solution
         run: dotnet build To-Do-List/To-Do-List.csproj --configuration Release --no-restore
 
-      - name: Apply EF migration: MyIdentityDbContext
+      - name: "Apply EF migration: MyIdentityDbContext"
         run: dotnet ef database update --context To_Do_List.Identity.DbContext.MyIdentityDbContext --project To-Do-List/To-Do-List.csproj --startup-project To-Do-List/To-Do-List.csproj
 
-      - name: Apply EF migration: TaskDbContext
+      - name: "Apply EF migration: TaskDbContext"
         run: dotnet ef database update --context To_Do_List.Tasks.DbContext.TaskDbContext --project To-Do-List/To-Do-List.csproj --startup-project To-Do-List/To-Do-List.csproj
 
-      - name: Apply EF migration: SystemConfigurationContext
+      - name: "Apply EF migration: SystemConfigurationContext"
         run: dotnet ef database update --context To_Do_List.Configuration.DbContext.SystemConfigurationContext --project To-Do-List/To-Do-List.csproj --startup-project To-Do-List/To-Do-List.csproj
 
       - name: Run tests
