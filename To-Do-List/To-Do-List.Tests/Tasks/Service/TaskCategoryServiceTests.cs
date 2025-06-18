@@ -324,7 +324,7 @@ public class TaskCategoryServiceTests
     {
         // Arrange
         mockCategoryRepository
-            .Setup(rep => rep.GetCategoryByIdAsync(categoryId, userId))
+            .Setup(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId))
             .ReturnsAsync(category);
         category.Name = name;
         category.Description = description;
@@ -334,11 +334,11 @@ public class TaskCategoryServiceTests
         
         // Act
         var actualResult = await sut
-            .UpdateCategoryAsync(categoryId, name, description, userId);
+            .UpdateCategoryAsync(categoryId, name, description, null, userId);
         
         // Assert
         actualResult.Should().Be(ApiResponseCode.CategoryUpdateSuccess);
-        mockCategoryRepository.Verify(rep => rep.GetCategoryByIdAsync(categoryId, userId), Times.Once);
+        mockCategoryRepository.Verify(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId), Times.Once);
         mockCategoryRepository.Verify(rep => rep.UpdateCategoryAsync(It.IsAny<Category>()), Times.Once);
         category.Name.Should().Be(name);
         category.Description.Should().Be(description);
@@ -358,7 +358,7 @@ public class TaskCategoryServiceTests
 
         // Arrange
         mockCategoryRepository
-            .Setup(rep => rep.GetCategoryByIdAsync(categoryId, userId))
+            .Setup(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId))
             .ReturnsAsync(category);
         category.Description = description;
         mockCategoryRepository
@@ -367,11 +367,11 @@ public class TaskCategoryServiceTests
         
         // Act
         var actualResult = await sut
-            .UpdateCategoryAsync(categoryId, null, description, userId);
+            .UpdateCategoryAsync(categoryId, null, description, null, userId);
         
         // Assert
         actualResult.Should().Be(ApiResponseCode.CategoryUpdateSuccess);
-        mockCategoryRepository.Verify(rep => rep.GetCategoryByIdAsync(categoryId, userId), Times.Once);
+        mockCategoryRepository.Verify(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId), Times.Once);
         mockCategoryRepository.Verify(rep => rep.UpdateCategoryAsync(It.IsAny<Category>()), Times.Once);
         category.Name.Should().Be(originalName);
         category.Description.Should().Be(description);
@@ -391,7 +391,7 @@ public class TaskCategoryServiceTests
 
         // Arrange
         mockCategoryRepository
-            .Setup(rep => rep.GetCategoryByIdAsync(categoryId, userId))
+            .Setup(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId))
             .ReturnsAsync(category);
         category.Name = name;
         mockCategoryRepository
@@ -400,11 +400,11 @@ public class TaskCategoryServiceTests
         
         // Act
         var actualResult = await sut
-            .UpdateCategoryAsync(categoryId, name, null, userId);
+            .UpdateCategoryAsync(categoryId, name, null, null, userId);
         
         // Assert
         actualResult.Should().Be(ApiResponseCode.CategoryUpdateSuccess);
-        mockCategoryRepository.Verify(rep => rep.GetCategoryByIdAsync(categoryId, userId), Times.Once);
+        mockCategoryRepository.Verify(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId), Times.Once);
         mockCategoryRepository.Verify(rep => rep.UpdateCategoryAsync(It.IsAny<Category>()), Times.Once);
         category.Name.Should().Be(name);
         category.Description.Should().Be(originalDes);
@@ -422,16 +422,16 @@ public class TaskCategoryServiceTests
     {
         // Arrange
         mockCategoryRepository
-            .Setup(rep => rep.GetCategoryByIdAsync(categoryId, userId))
+            .Setup(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId))
             .ReturnsAsync(null as Category);
         
         // Act
         var actualResult = await sut
-            .UpdateCategoryAsync(categoryId, name, description, userId);
+            .UpdateCategoryAsync(categoryId, name, description, null, userId);
         
         // Assert
         actualResult.Should().Be(ApiResponseCode.CategoryIdNotFoundForCurrentUser);
-        mockCategoryRepository.Verify(rep => rep.GetCategoryByIdAsync(categoryId, userId), Times.Once);
+        mockCategoryRepository.Verify(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId), Times.Once);
         mockCategoryRepository.Verify(rep => rep.UpdateCategoryAsync(It.IsAny<Category>()), Times.Never);
     }
     
@@ -447,7 +447,7 @@ public class TaskCategoryServiceTests
     {
         // Arrange
         mockCategoryRepository
-            .Setup(rep => rep.GetCategoryByIdAsync(categoryId, userId))
+            .Setup(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId))
             .ReturnsAsync(category);
         category.Name = name;
         mockCategoryRepository
@@ -456,11 +456,11 @@ public class TaskCategoryServiceTests
         
         // Act
         var actualResult = await sut
-            .UpdateCategoryAsync(categoryId, name, null, userId);
+            .UpdateCategoryAsync(categoryId, name, null, null, userId);
         
         // Assert
         actualResult.Should().Be(ApiResponseCode.CategoryUpdateFailedInDB);
-        mockCategoryRepository.Verify(rep => rep.GetCategoryByIdAsync(categoryId, userId), Times.Once);
+        mockCategoryRepository.Verify(rep => rep.GetMayDeletedCategoryByIdAsync(categoryId, userId), Times.Once);
         mockCategoryRepository.Verify(rep => rep.UpdateCategoryAsync(It.IsAny<Category>()), Times.Once);
     }
     

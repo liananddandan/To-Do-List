@@ -95,9 +95,9 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
     }
 
     public async Task<ApiResponseCode> UpdateCategoryAsync(string categoryId, string? name,
-        string? description, string userId)
+        string? description, Boolean? isDeleted, string userId)
     {
-        var category = await categoryRepository.GetCategoryByIdAsync(categoryId, userId);
+        var category = await categoryRepository.GetMayDeletedCategoryByIdAsync(categoryId, userId);
         if (category == null)
         {
             return ApiResponseCode.CategoryIdNotFoundForCurrentUser;
@@ -111,6 +111,11 @@ public class TaskCategoryService(ICategoryRepository categoryRepository, ITaskRe
         if (!string.IsNullOrEmpty(description))
         {
             category.Description = description;
+        }
+
+        if (isDeleted.HasValue)
+        {
+            category.IsDeleted = isDeleted.Value;
         }
 
         try

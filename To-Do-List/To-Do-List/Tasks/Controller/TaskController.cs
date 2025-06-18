@@ -67,7 +67,8 @@ public class TaskController(TaskCategoryService taskCategoryService) : ProjectBa
     [HttpPut]
     public async Task<ActionResult> UpdateCategoryAsync(UpdateCategoryRequest request)
     {
-        var result = await taskCategoryService.UpdateCategoryAsync(request.CategoryId, request.Name, request.Description, UserId);
+        var result = await taskCategoryService.UpdateCategoryAsync(request.CategoryId, request.Name,
+            request.Description, request.isDeleted, UserId);
         if (result != ApiResponseCode.CategoryUpdateSuccess)
         {
             return BadRequest(new ResponseData(result, "Category update failed"));

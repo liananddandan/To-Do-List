@@ -24,6 +24,14 @@ public class CategoryRepository(TaskDbContext taskDbContext) : ICategoryReposito
             .FirstOrDefaultAsync();
     }
 
+    public async Task<Category?> GetMayDeletedCategoryByIdAsync(string categoryId, string userId)
+    {
+        return await taskDbContext.Categories
+            .Where(c => c.UserId == userId
+                        && c.Id == Convert.ToInt64(categoryId))
+            .FirstOrDefaultAsync();
+    }
+
     public async Task<ApiResponseCode> AddCategoryAsync(Category category)
     {
         if (category.UserId == null)

@@ -45,12 +45,12 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AWebApplicationFactory_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F255f916e5a2d424ef01b291afc761e049b367614440bf4b216824ec479064b_003FWebApplicationFactory_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AWebHostBuilderBase_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F5aea8b7958bf847e6d9e728a31c2bd2cc0beb281c2c78632aaf53f866d16921_003FWebHostBuilderBase_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AXunitException_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F32d0fc351fcbc05e85edf1ea9697248d195b86de1aaa7ecba598f939c25ee9d_003FXunitException_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4ddf9086_002Df467_002D468e_002D9aeb_002Da55d4489709f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="CreateTaskAsync_ShouldReturnSuccess" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4ddf9086_002Df467_002D468e_002D9aeb_002Da55d4489709f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="CreateTaskAsync_ShouldReturnSuccess" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;xUnit::E366040E-A002-4057-89C9-2DD3BB75E16C::net9.0::To_Do_List.Tests.Tasks.Controller.TaskControllerTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cda77276_002De639_002D457b_002Da7d2_002D6d25b604dbeb/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="FailingTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=cda77276_002De639_002D457b_002Da7d2_002D6d25b604dbeb/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FailingTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;xUnit::E366040E-A002-4057-89C9-2DD3BB75E16C::net9.0::To_Do_List.Tests.Tasks.Service.TaskCategoryServiceTests&lt;/TestId&gt;
     &lt;TestId&gt;xUnit::E366040E-A002-4057-89C9-2DD3BB75E16C::net9.0::To_Do_List.Tests.Tasks.Implement.TaskRepositoryTests.GetTasksByCategoryIdAsync_ShouldReturnTasksWithGivenCategoryId&lt;/TestId&gt;
@@ -64,6 +64,7 @@
     &lt;TestId&gt;xUnit::E366040E-A002-4057-89C9-2DD3BB75E16C::net9.0::To_Do_List.Tests.Tasks.Implement.CategoryRepositoryTests.GetAllCategoriesWithoutTasksAsync_ReturnsAllCategories&lt;/TestId&gt;
     &lt;TestId&gt;xUnit::E366040E-A002-4057-89C9-2DD3BB75E16C::net9.0::To_Do_List.Tests.Tasks.Implement.CategoryRepositoryTests.UpdateCategoryAsync_SuccessUpdatesCategory&lt;/TestId&gt;
     &lt;TestId&gt;xUnit::E366040E-A002-4057-89C9-2DD3BB75E16C::net9.0::To_Do_List.Tests.Tasks.Controller.TaskControllerTests.CreateTaskAsync_ShouldReturnSuccess&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::E366040E-A002-4057-89C9-2DD3BB75E16C::net9.0::To_Do_List.Tests.Tasks.Controller.TaskControllerTests.DeleteCategoryAsync_ShouldReturnSuccess&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

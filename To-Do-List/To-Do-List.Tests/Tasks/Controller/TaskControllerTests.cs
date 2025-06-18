@@ -149,7 +149,7 @@ public class TaskControllerTests(TestingWebApplicationFactory<Program> factory, 
         var token = _tokenHelper.CreateToken(entry, TokenType.AccessToken);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.TokenStr);
         var uuid = Guid.NewGuid().ToString();
-        var request = new UpdateCategoryRequest("4", "", "updated Description " + uuid);
+        var request = new UpdateCategoryRequest("4", "", "updated Description " + uuid, null);
         
         // Action
         var response = await _client.PutAsJsonAsync("/Task/UpdateCategory", request);
@@ -187,5 +187,9 @@ public class TaskControllerTests(TestingWebApplicationFactory<Program> factory, 
         apiResponse.Should().NotBeNull();
         apiResponse.Data.Code.Should().Be(300004);
         apiResponse.Data.Info.Should().BeEquivalentTo("Category deleted successfully");
+        
+        // restore delete status
+        var resetRequest = new UpdateCategoryRequest("8", null, null, false);
+        await _client.PutAsJsonAsync("/Task/UpdateCategory", resetRequest);
     }
 }
