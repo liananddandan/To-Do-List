@@ -23,7 +23,7 @@ using To_Do_List.Tasks.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ✅ 手动添加 UserSecrets，而不是用 builder.Host.ConfigureAppConfiguration
+// add UserSecrets，而不是用 builder.Host.ConfigureAppConfiguration
 if (!builder.Environment.IsProduction())
 {
     builder.Configuration.AddUserSecrets(typeof(Program).Assembly, optional: true);
