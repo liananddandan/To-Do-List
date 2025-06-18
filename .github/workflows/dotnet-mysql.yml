@@ -37,7 +37,7 @@ jobs:
       - name: Setup .NET 9 Preview
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '9.0.100-preview.4.24266.19'
+          dotnet-version: '9.0.300'
 
       - name: Install EF Core CLI tools
         run: dotnet tool install --global dotnet-ef
