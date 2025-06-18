@@ -62,5 +62,5 @@ jobs:
         run: dotnet ef database update --context To_Do_List.Configuration.DbContext.SystemConfigurationContext --project To-Do-List/To-Do-List.csproj --startup-project To-Do-List/To-Do-List.csproj
 
       - name: Run tests
-        run: dotnet test To-Do-List.Tests/To-Do-List.Tests.csproj --configuration Release --verbosity detailed
+        run: dotnet test To-Do-List.Tests/To-Do-List.Tests.csproj --configuration Release --logger "console;verbosity=normal"
 
