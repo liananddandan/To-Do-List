@@ -75,22 +75,27 @@ identityBuilder.AddEntityFrameworkStores<MyIdentityDbContext>()
 
 // JWT
 var jwtJson = builder.Configuration[JwtTokenOption.JwtKey];
-JwtTokenOption jwtOptions = JsonSerializer.Deserialize<JwtTokenOption>(jwtJson);
-if (jwtOptions != null)
+if (string.IsNullOrEmpty(jwtJson))
 {
-    builder.Services.Configure<JwtTokenOption>(options =>
-    {
-        options.Issuer = jwtOptions.Issuer;
-        options.Audience = jwtOptions.Audience;
-        options.IssuerSigningKey = jwtOptions.IssuerSigningKey;
-        options.AccessTokenExpiresMinutes = jwtOptions.AccessTokenExpiresMinutes;
-        options.RefreshTokenExpiresDays = jwtOptions.RefreshTokenExpiresDays;
-    });
+    jwtJson = Environment.GetEnvironmentVariable("JWT_JSON");
 }
-else
+
+if (string.IsNullOrEmpty(jwtJson))
 {
     throw new ArgumentException("JWT token options are required.");
 }
+
+var jwtOptions = JsonSerializer.Deserialize<JwtTokenOption>(jwtJson)
+                 ?? throw new JsonException("Invalid JWT configuration.");
+
+builder.Services.Configure<JwtTokenOption>(options =>
+{
+    options.Issuer = jwtOptions.Issuer;
+    options.Audience = jwtOptions.Audience;
+    options.IssuerSigningKey = jwtOptions.IssuerSigningKey;
+    options.AccessTokenExpiresMinutes = jwtOptions.AccessTokenExpiresMinutes;
+    options.RefreshTokenExpiresDays = jwtOptions.RefreshTokenExpiresDays;
+});
 
 builder.Services.AddAuthentication(options =>
 {
@@ -100,7 +105,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.RequireHttpsMetadata = false;
     options.SaveToken = true;
-    options.TokenValidationParameters = new ()
+    options.TokenValidationParameters = new()
     {
         ValidateIssuer = true,
         ValidIssuer = jwtOptions.Issuer,
@@ -118,7 +123,7 @@ builder.Services.AddAuthentication(options =>
             Console.WriteLine($"Authentication failed: {context.Exception.Message}");
             return Task.CompletedTask;
         },
-        OnTokenValidated = context =>
+        OnTokenValidated = _ =>
         {
             Console.WriteLine("Token validated successfully");
             return Task.CompletedTask;
@@ -145,12 +150,9 @@ builder.Services.AddControllers(options =>
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("DynamicCORS", builder =>
+    options.AddPolicy("DynamicCORS", configurePolicy =>
     {
-        builder.SetIsOriginAllowed(origin =>
-            {
-                return origin.Contains("localhost");
-            })
+        configurePolicy.SetIsOriginAllowed(origin => origin.Contains("localhost"))
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -176,4 +178,6 @@ app.MapControllers();
 
 app.Run();
 
-public partial class Program { }
+public partial class Program
+{
+}

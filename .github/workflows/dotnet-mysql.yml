@@ -29,6 +29,7 @@ jobs:
     env:
       ConnectionStrings__DefaultConnection: "server=127.0.0.1;port=3306;database=testdb;uid=testuser;pwd=testpass"
       ASPNETCORE_ENVIRONMENT: Production
+      JWT_JSON: '{"Issuer":"test-issuer","Audience":"test-audience","IssuerSigningKey":"fake-secret-key12345678!@#$%^&*","AccessTokenExpiresMinutes":30,"RefreshTokenExpiresDays":7}'
 
     steps:
       - name: Checkout code
