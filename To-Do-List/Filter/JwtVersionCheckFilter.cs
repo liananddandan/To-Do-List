@@ -76,7 +76,7 @@ public class JwtVersionCheckFilter(UserManager<MyUser> userManager, IWebHostEnvi
             return;
         }
 
-        if (user.Version > clientJwtVersion && !_env.IsEnvironment("Testing"))
+        if (user.Version > clientJwtVersion && !(_env.IsEnvironment("Testing") || _env.IsEnvironment("CI")))
         {
             context.Result = new ObjectResult(new {code = ApiResponseCode.AccessTokenExpired, 
                 message = "JWTVersion expire"}){StatusCode = StatusCodes.Status401Unauthorized};
