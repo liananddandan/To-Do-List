@@ -24,10 +24,10 @@ using To_Do_List.Tasks.Service;
 var builder = WebApplication.CreateBuilder(args);
 
 // add UserSecrets，而不是用 builder.Host.ConfigureAppConfiguration
-if (!builder.Environment.IsProduction())
-{
-    builder.Configuration.AddUserSecrets(typeof(Program).Assembly, optional: true);
-}
+// if (!builder.Environment.IsProduction())
+// {
+//     builder.Configuration.AddUserSecrets(typeof(Program).Assembly, optional: true);
+// }
 
 builder.Logging.AddConsole();
 
@@ -37,13 +37,6 @@ builder.Services.AddControllers();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
-builder.Configuration.AddEFConfiguration(options =>
-    {
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-    }
-);
 
 // configure Identity
 builder.Services.AddDbContext<MyIdentityDbContext>(options =>
@@ -56,6 +49,17 @@ builder.Services.AddDbContext<TaskDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
+
+var env = builder.Environment;
+if (!env.IsEnvironment("Testing") && !env.IsEnvironment("CI"))
+{
+    builder.Configuration.AddEFConfiguration(options =>
+        {
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        }
+    );
+}
 
 builder.Services.AddDataProtection();
 builder.Services.AddIdentityCore<MyUser>(options =>
@@ -72,6 +76,7 @@ identityBuilder.AddEntityFrameworkStores<MyIdentityDbContext>()
     .AddDefaultTokenProviders()
     .AddRoleManager<RoleManager<MyRole>>()
     .AddUserManager<UserManager<MyUser>>();
+
 
 // JWT
 var jwtJson = builder.Configuration[JwtTokenOption.JwtKey];
