@@ -1,8 +1,18 @@
 // src/stores/auth.js
 import { ref } from 'vue'
 
+function normalizeUserInfo(info) {
+  if (!info) return null
+
+  if (info.info && typeof info.info === 'object') {
+    return info.info
+  }
+
+  return info
+}
+
 export const isLoggedIn = ref(!!getAccessToken())
-export const userInfo = ref(JSON.parse(localStorage.getItem('user_info')) || null)
+export const userInfo = ref(normalizeUserInfo(JSON.parse(localStorage.getItem('user_info')) || null))
 
 export function login(accessToken, refreshToken) {
   saveTokens(accessToken, refreshToken)
@@ -24,8 +34,9 @@ export function logout() {
 }
 
 export function setUserInfo(info) {
-    localStorage.setItem('user_info', JSON.stringify(info))
-    userInfo.value = info
+    const normalizedInfo = normalizeUserInfo(info)
+    localStorage.setItem('user_info', JSON.stringify(normalizedInfo))
+    userInfo.value = normalizedInfo
 }
 
 export function getAccessToken(){

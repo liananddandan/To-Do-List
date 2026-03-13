@@ -80,8 +80,8 @@ const loginEvent = async () => {
     login(accessToken, refreshToken)
 
     const userInfoResponse = await api.get('/api/users/me')
-    const userInfo = userInfoResponse.data.data
-    setUserInfo(userInfo)
+    const currentUser = userInfoResponse.data?.data?.info
+    setUserInfo(currentUser)
 
     router.push('/')
   } catch (err) {
