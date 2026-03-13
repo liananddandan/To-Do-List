@@ -1,0 +1,49 @@
+:root {
+  --page-background:
+    radial-gradient(circle at top left, rgba(72, 187, 120, 0.12), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(14, 116, 144, 0.14), transparent 26%),
+    linear-gradient(135deg, #f4f7fb 0%, #eef4f1 50%, #edf3fa 100%);
+  --surface: rgba(255, 255, 255, 0.94);
+  --surface-strong: #ffffff;
+  --surface-muted: #f8fafc;
+  --border: #dbe4ea;
+  --border-strong: #c7d4dd;
+  --text-primary: #14213d;
+  --text-secondary: #526071;
+  --text-tertiary: #7b8794;
+  --brand: #2f855a;
+  --brand-strong: #276749;
+  --brand-soft: #e6f6ed;
+  --accent: #0f766e;
+  --danger: #c2410c;
+  --danger-soft: #fff3eb;
+  --warning-soft: #fff7e6;
+  --shadow-soft: 0 18px 40px rgba(15, 23, 42, 0.08);
+  --shadow-strong: 0 20px 50px rgba(15, 23, 42, 0.14);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  background: #eef4f1;
+}
+
+body {
+  min-height: 100vh;
+  color: var(--text-primary);
+  background: var(--page-background);
+  line-height: 1.6;
+  font-family:
+    "Avenir Next",
+    'Segoe UI',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

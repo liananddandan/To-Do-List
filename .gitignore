@@ -1,0 +1,112 @@
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# =========================
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.suo
+*.user
+.userosscache
+.sln.docstates
+
+# =========================
+# Logs
+# =========================
+logs/
+.log
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# =========================
+# Node / Frontend (Vue)
+# =========================
+node_modules/
+dist/
+build/
+coverage/
+.local
+.env
+.env.
+!.env.example
+
+# =========================
+# .NET / ASP.NET Core
+# =========================
+bin/
+obj/
+out/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.dbmdl
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# =========================
+# EF Core migrations cache
+# =========================
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Publish output
+# =========================
+publish/
+wwwroot/dist/
+
+# =========================
+# Temporary files
+# =========================
+tmp/
+temp/
+*.tmp
+
+# =========================
+# Test results
+# =========================
+TestResults/
+*.trx
+
+# =========================
+# Docker
+# =========================
+docker-compose.override.yml
+
+# =========================
+# Misc
+# =========================
+*.swp
+*.bak
+*.orig
+
+*/.idea
+
+# Test coverage
+coverage-report/
+**/coverage-report/
+**/coverage/
