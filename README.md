@@ -1,4 +1,18 @@
 # Clean Architecture .NET Web API
+## Quick Start (Docker)
+You can run the full stack (Frontend + Backend + MySQL) using Docker Compose.
+### Start All Services
+docker compose up --build
+### Services
+Frontend
+http://localhost:5173
+Backend API
+http://localhost:5166
+MySQL 
+http://localhost:3308
+### Stop Services
+docker compose down
+
 ## 1. **Introduction**
    * Project Title: Clean Architecture .NET Web API
    * An open-source Clean Architecture Web API template for .NET developers, featuring structured layers, test coverage, and modern API tooling.
@@ -222,56 +236,7 @@ This project uses GitHub Actions to automate the continuous integration process.
 - Executes all unit and integration tests using `dotnet test`
 - Uses detailed test logs and warnings display for better debugging
 
-## 8. **Getting Started**
-
-### Prerequisites
-- [.NET 9 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
-- MySQL (if using real database instead of in-memory)
-- IDE: JetBrains Rider or Visual Studio Code
-
-### Database Setup (EF Core Migrations)
-This project uses multiple `DbContext` classes. Run the following commands to apply all necessary migrations:
-```bash
-# Apply migration for Identity
-dotnet ef database update --context To_Do_List.Identity.DbContext.MyIdentityDbContext \
-  --project To-Do-List/To-Do-List.csproj \
-  --startup-project To-Do-List/To-Do-List.csproj
-
-# Apply migration for Task module
-dotnet ef database update --context To_Do_List.Tasks.DbContext.TaskDbContext \
-  --project To-Do-List/To-Do-List.csproj \
-  --startup-project To-Do-List/To-Do-List.csproj
-
-# Apply migration for System Configuration
-dotnet ef database update --context To_Do_List.Configuration.DbContext.SystemConfigurationContext \
-  --project To-Do-List/To-Do-List.csproj \
-  --startup-project To-Do-List/To-Do-List.csproj
-````
-
-> ⚠️ Make sure configuration contains the correct connection strings for all contexts.
-
-### Run the Project
-
-```bash
-dotnet run --project To-Do-List
-```
-
-Visit your API at:
-`https://localhost:{port}`
-
-### API Documentation
-
-* Scalar UI: `https://localhost:{port}/scalar/`
-
-### Run Tests
-
-```bash
-dotnet test
-```
-
-> All tests run using in-memory DB and mock dependencies, controller run using test MySQL database
-
-## 9. **Developer Resources / Blog**
+## 8. **Developer Resources / Blog**
 
 For in-depth explanations of design choices, technical challenges, and clean architecture practices used in this project, check out my blog series on [DEV Community](https://dev.to/alexleeeeeeeeee):
 
