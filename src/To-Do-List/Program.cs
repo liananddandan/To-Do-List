@@ -149,6 +149,25 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    try
+    {
+        var identityDb = services.GetRequiredService<MyIdentityDbContext>();
+        identityDb.Database.Migrate();
+
+        var taskDb = services.GetRequiredService<TaskDbContext>();
+        taskDb.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("Database migration failed:");
+        Console.WriteLine(ex);
+    }
+}
+
 app.Run();
 
 public partial class Program { }
